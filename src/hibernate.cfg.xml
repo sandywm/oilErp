@@ -7,12 +7,56 @@
 <hibernate-configuration>
 
 	<session-factory>
-		<property name="show_sql">true</property>
-		<property name="hibernate.dialect">org.hibernate.dialect.Oracle9iDialect</property>
-		<property name="hibernate.connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
+		<property name="show_sql">false</property>
+		<property name="hibernate.connection.driver_class">
+			oracle.jdbc.driver.OracleDriver
+		</property>
 		<property name="hibernate.connection.username">cyrc</property>
-		<property name="hibernate.connection.password">4840494</property>
-		<property name="hibernate.connection.url">jdbc:oracle:thin:@10.75.208.11:1521:ora9i</property>
+		<property name="hibernate.connection.password">
+			4840494
+		</property>
+		<property name="hibernate.connection.url">
+			jdbc:oracle:thin:@10.75.208.11:1521:ora9i
+		</property>
+		<!-- C3P0 connection pool  -->
+		<property name="hibernate.connection.provider_class">
+			org.hibernate.connection.C3P0ConnectionProvider
+		</property>
+		<!-- 最大连接数 -->
+		<property name="hibernate.c3p0.max_size">25</property>
+		<!-- 最小连接数 -->
+		<property name="hibernate.c3p0.min_size">1</property>
+		<!-- 获得连接的超时时间,如果超过这个时间,会抛出异常，单位毫秒 -->
+		<property name="hibernate.c3p0.timeout">5000</property>
+		<!-- 最大的PreparedStatement的数量 -->
+		<property name="hibernate.c3p0.max_statements">100</property>
+		<!-- 每隔120秒检查连接池里的空闲连接 ，单位是秒-->
+		<property name="hibernate.c3p0.idle_test_period">3000</property>
+		<!-- 当连接池耗尽并接到获得连接的请求，则新增加连接的数量 -->
+		<property name="hibernate.c3p0.acquire_increment">2</property>
+		<!-- 是否验证，检查连接 -->
+		<property name="hibernate.c3p0.validate">true</property>
+		<!-- 防止hibernate3.0查询不出中文的异常 -->
+		<property name="hibernate.query.factory_class">
+			org.hibernate.hql.classic.ClassicQueryTranslatorFactory
+		</property>
+		<property name="dialect">
+			org.hibernate.dialect.Oracle9iDialect
+		</property>
+		<!-- 允许Hibernate使用JDBC2的批量更新最大条数 -->
+		<property name="hibernate.jdbc.batch_size">30</property>
+		<!-- 关闭sessionFactory的二级缓存 -->
+		<property name="cache.use_second_level_cache">false</property>
+
+		<!-- Echo all executed SQL to stdout -->
+		<property name="show_sql">false</property>
+
+		<!-- Drop and re-create the database schema on startup -->
+		<property name="hbm2ddl.auto">update</property>
+		<property name="myeclipse.connection.profile">
+			myDataBase
+		</property>
+		<mapping resource="com/oil/xml/Dba02.hbm.xml" />
 	</session-factory>
 
 </hibernate-configuration>

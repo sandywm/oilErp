@@ -6,7 +6,16 @@
   <form-beans />
   <global-exceptions />
   <global-forwards />
-  <action-mappings />
+  <action-mappings >
+    <action path="/common" parameter="action" scope="request" type="com.oil.action.comm.CommonAction">
+      <set-property property="cancellable" value="true" />
+    </action>
+    <action path="/login" parameter="action" scope="request" type="com.oil.action.login.LoginAction">
+      <set-property property="cancellable" value="true" />
+    </action>
+
+  </action-mappings>
+
   <message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 </struts-config>
 
