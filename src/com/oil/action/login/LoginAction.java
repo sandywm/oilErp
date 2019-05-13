@@ -55,7 +55,7 @@ public class LoginAction extends DispatchAction {
 		if(!account.equals("") && !password.equals("")){
 			String s = null;
 			File file = new File(WebUrl.DATA_URL_JSON + "/loginUser.json");
-			InputStreamReader br = new InputStreamReader(new FileInputStream(file),"utf-8");//读取文件,同时指定编码
+			InputStreamReader br = new InputStreamReader(new FileInputStream(file),"UTF-8");//读取文件,同时指定编码
 			StringBuffer sb = new StringBuffer();
 	        char[] ch = new char[128];  //一次读取128个字符
 	        int len = 0;

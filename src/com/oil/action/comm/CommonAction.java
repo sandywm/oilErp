@@ -6,13 +6,19 @@ package com.oil.action.comm;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -42,6 +48,9 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.oil.factory.AppFactory;
 import com.oil.module.Dba02;
 import com.oil.service.Dba02Manager;
@@ -281,13 +290,15 @@ public class CommonAction extends DispatchAction {
 	 */
 	public ActionForward dealZsExcel(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		Map<String,String> map_final = new HashMap<String,String>();
 		System.out.println("数据分析开始--"+CurrentTime.getCurrentTime());
 		Dba02Manager dm = (Dba02Manager) AppFactory.instance(null).getApp(Constants.WEB_DBA_02_INFO);
+		
 		String filePath = "d:\\2019-03_sj.xlsx";
 		String fileName = "2019-03_sj";
 //		String fileName = Transcode.unescape_new("fileName", request);//文件名称
 //		String filePath = CommonTools.getFinalStr("filePath", request);
-		String absoFilePath = WebUrl.DATA_URL_PRO + "\\" + filePath;
+		String absoFilePath = WebUrl.DATA_URL_PRO + "/" + filePath;
 		File f = new File(filePath);
     	InputStream inputStream = new FileInputStream(f);
     	XSSFWorkbook xssfWorkbook = new XSSFWorkbook(inputStream);
@@ -389,10 +400,120 @@ public class CommonAction extends DispatchAction {
     	xssfWorkbook.write(fout);  
         fout.close(); 
         System.out.println("数据分析结束--"+CurrentTime.getCurrentTime());
-        //数据分析完成后王json中自动增加记录
-//        CommonTools.addJsonData(fileName, month, CurrentTime.getCurrentTime(), year, absoFilePath);
+        map_final.put("fileName", fileName);
+        map_final.put("month", specDate);
+        map_final.put("filePath", absoFilePath);
+        CommonTools.getJsonPkg(map_final, response);
 		return null; 	
 	}
 	
+	/**
+	 * 增加注水合格率分析记录
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward addHglData(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// TODO Auto-generated method stub
+		 Map<String,String> map = new HashMap<String,String>();
+		 String fileName = Transcode.unescape_new1("fileName", request);
+		 String month = fileName.split("_")[0];
+		 String filePath = CommonTools.getFinalStr("filePath", request);
+		String s = null;
+		String dataPath = WebUrl.DATA_URL_JSON + "/hgl.json";
+		File file = new File(dataPath);
+		InputStreamReader br = new InputStreamReader(new FileInputStream(file),"utf-8");//读取文件,同时指定编码
+		StringBuffer sb = new StringBuffer();
+        char[] ch = new char[128];  //一次读取128个字符
+        int len = 0;
+        while((len = br.read(ch,0, ch.length)) != -1){
+            sb.append(ch, 0, len);
+        }
+        s = sb.toString();
+        //新增加的记录
+        JSONObject appObject = new JSONObject();
+        appObject.put("fileName", fileName);
+        appObject.put("month", month);
+        appObject.put("fxDate", CurrentTime.getCurrentTime());
+        appObject.put("year", month.split("-")[0]);
+        appObject.put("filePath", filePath);
+        
+        String newStr = "";
+        if(s.equals("")){//新增加
+        	JSONArray appArray = new JSONArray();
+        	appArray.add(appObject);
+        	JSONObject jsonObj = new JSONObject();
+        	jsonObj.put("excelList", appArray);
+        	newStr = jsonObj.toJSONString();
+        }else{//追加
+        	JSONObject dataJson = JSON.parseObject(s); 
+            JSONArray features = dataJson.getJSONArray("excelList");// 找到features json数组
+            features.add(appObject);
+            newStr = dataJson.toJSONString();
+        }
+    	File file_1 = new File(dataPath);
+    	Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file_1), "UTF-8"));
+    	out.write(newStr);
+    	out.flush();
+    	out.close();
+        map.put("result", "success");
+        CommonTools.getJsonPkg(map, response);
+		return null;
+	}
+	
+	/**
+	 * 获取注水分析数据记录(下载用)
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getHglData(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// TODO Auto-generated method stub
+		String specYear = CommonTools.getFinalStr("specYear", request);
+		String s = null;
+		File file = new File(WebUrl.DATA_URL_JSON + "/hgl.json");
+		InputStreamReader br = new InputStreamReader(new FileInputStream(file),"utf-8");//读取文件,同时指定编码
+		StringBuffer sb = new StringBuffer();
+        char[] ch = new char[128];  //一次读取128个字符
+        int len = 0;
+        while((len = br.read(ch,0, ch.length)) != -1){
+            sb.append(ch, 0, len);
+        }
+        s = sb.toString();
+        JSONObject dataJson = JSON.parseObject(s); 
+        JSONArray features = dataJson.getJSONArray("excelList");// 找到features json数组
+        Map<String,Object> map = new HashMap<String,Object>();
+        List<Object> list_d = new ArrayList<Object>();
+        String msg = "noInfo";
+        for(Integer i = 0 ; i < features.size() ; i++){
+        	JSONObject obj = features.getJSONObject(i);// 获取features数组的第i个json对象
+        	Map<String,String> map_d = new HashMap<String,String>();
+        	String year = obj.getString("year");//获取年份
+        	if(year.equals(specYear)){
+        		msg = "success";
+        		map_d.put("fileName", obj.getString("fileName"));
+        		map_d.put("month", obj.getString("month"));
+        		map_d.put("fxDate", obj.getString("fxDate"));
+        		map_d.put("filePath", obj.getString("filePath"));
+        		list_d.add(map_d);
+        	}else{
+        		continue;
+        	}
+        }
+        if(msg.equals("success")){
+        	map.put("fileList", list_d);
+        }
+        map.put("result", msg);
+        CommonTools.getJsonPkg(map, response);
+		return null;
+	}
 	
 }
