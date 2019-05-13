@@ -13,7 +13,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -43,7 +42,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.alibaba.fastjson.JSON;
 import com.oil.factory.AppFactory;
 import com.oil.module.Dba02;
 import com.oil.service.Dba02Manager;
