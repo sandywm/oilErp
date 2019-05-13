@@ -114,7 +114,6 @@ public class CommonAction extends DispatchAction {
 					Double hg = rzsl / rpzsl;
 					if(hg >= 0.9 && hg <= 1.1){
 						map_d.put("hg", "合格");//
-//						hgDays += 1;
 					}else{
 						map_d.put("hg", "不合格");//
 					}
