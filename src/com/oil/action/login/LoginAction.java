@@ -103,5 +103,4 @@ public class LoginAction extends DispatchAction {
 		request.getSession(false).invalidate();
 		return mapping.findForward("loginOut");
 	}
-	
 }
