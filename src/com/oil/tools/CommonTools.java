@@ -12,12 +12,29 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.RegionUtil;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -460,7 +477,67 @@ public class CommonTools {
 	}
 	
 	
+	/**
+	 * 设置单个单元格的边框
+	 * @description
+	 * @author Administrator
+	 * @date 2018-11-21 上午09:49:59
+	 * @param style
+	 */
+	public static void setBorderStyle(XSSFCellStyle style){
+		style.setBorderBottom(XSSFCellStyle.BORDER_THIN); //下边框    
+        style.setBorderLeft(XSSFCellStyle.BORDER_THIN);//左边框    
+        style.setBorderTop(XSSFCellStyle.BORDER_THIN);//上边框    
+        style.setBorderRight(XSSFCellStyle.BORDER_THIN);//右边框 
+	}
+	
+	public static void setJoinBorderStyle(int border, Integer rowIndex, Integer lastRow, Integer firstColumn, Integer lastColumn, XSSFSheet sheet, XSSFWorkbook wb){
+		CellRangeAddress region = new CellRangeAddress(rowIndex,lastRow,firstColumn,lastColumn);//first row (0-based)  from 行
+		sheet.addMergedRegion(region);
+		
+        RegionUtil.setBorderBottom(border, region, sheet, wb);   //下边框
+        RegionUtil.setBorderLeft(border, region, sheet, wb);     //左边框
+        RegionUtil.setBorderRight(border, region, sheet, wb);    //右边框
+        RegionUtil.setBorderTop(border, region, sheet, wb);      //上边框
+    }
+	
+	
 	public static void main(String[] args){
-
+		Map<String, Integer> map_d = new HashMap<String, Integer>();
+		String bb = "1,2,3,4,1,1,1,1,3,1,2";
+		for(int i = 0 ; i < bb.split(",").length ; i++){
+			Integer num = map_d.get("comNum_"+bb.split(",")[i]) == null ? 0 : map_d.get("comNum_"+bb.split(",")[i]);
+			map_d.put("comNum_"+bb.split(",")[i], num + 1);
+		}
+//		
+		
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("aa_1", "aaaa");
+		System.out.println(map.get("aa_1"));
+//		for(String key : map_d.keySet()){
+//			int value = map_d.get(key);
+//			System.out.println(key+"  "+value);
+//		}
+		
+//		Map<String, Integer> map = new HashMap<String, Integer>();     
+//        map.put("d", 1);
+//        map.put("c", 2);
+//        map.put("a", 3);
+//        map.put("b", 4);
+        
+        //这里将map.entrySet()转换成list
+        List<Map.Entry<String,Integer>> list = new ArrayList<Map.Entry<String,Integer>>(map_d.entrySet());
+        //然后通过比较器来实现排序
+        Collections.sort(list,new Comparator<Map.Entry<String,Integer>>() {
+            //升序排序
+            public int compare(Entry<String, Integer> o1,
+                    Entry<String, Integer> o2) {
+                return o1.getKey().compareTo(o2.getKey());
+            }
+            
+        });
+//        for(Map.Entry<String,Integer> mapping:list){ 
+//            System.out.println(mapping.getKey()+":"+mapping.getValue()); 
+//       } 
 	}
 }

@@ -76,6 +76,8 @@ public class LoginAction extends DispatchAction {
 	        		result = "succ";
 	        		map.put("groupName", stuInfo.getString("groupName"));
 	        		map.put("moduleId", stuInfo.getString("moduleId"));
+	        		map.put("userName", stuInfo.getString("userName"));
+	        		request.getSession(false).setAttribute("userName", stuInfo.getString("userName"));
 	        		break;
 	        	}else{
 	        		result = "fail";
