@@ -85,6 +85,23 @@ public class CommonAction extends DispatchAction {
 	}
 	
 	/**
+	 * 导向注水合格率页面
+	 * @author wm
+	 * @date 2019-5-14 下午08:49:46 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward goZsPage(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		request.getSession(false).invalidate();
+		return mapping.findForward("zsPage");
+	}
+	
+	/**
 	 * 根据水井号、时间段分页获取水井列表
 	 * @param mapping
 	 * @param form
