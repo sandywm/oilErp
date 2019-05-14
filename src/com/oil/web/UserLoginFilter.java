@@ -45,17 +45,13 @@ public class UserLoginFilter implements Filter{
 	    String requesturi = requestUrl[0]; 
 		// 通过检查session中的变量，过滤请求
 		HttpSession session = httpServletRequest.getSession(false);
-		Integer loginFlag = -1;
-		String loginType = "";
-		Integer userId = 0;
+		String userName = "";
 		if(session != null){
-			
+			userName = String.valueOf(session.getAttribute("userName"));
 		}
 		Integer loginFlag_dataBase = -1;
-		if(userId.equals(0)){
+		if(userName.equals("") || userName.equals("null")){
 			if(!requesturi.endsWith("/login.do") 
-					&& !requesturi.endsWith("/common.do")
-					&& !requesturi.endsWith("/login.do")
 					&& !requesturi.endsWith("/authImg")
 					&& !requesturi.endsWith("jsp")
 					&& !requesturi.endsWith("css") 
@@ -75,22 +71,7 @@ public class UserLoginFilter implements Filter{
             }
 			chain.doFilter(request, response);
 		}else{
-			try {
-				
-				//获取数据库中指定currentUser的loginFlag
-				
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if(!loginFlag.equals(loginFlag_dataBase)){
-				session.invalidate();
-				String url = "window.top.location.href='login.do?action=loginOut'";
-				String authorizeScript = "该账号已经在别处登录，系统已强制您下线，请重新登录！";
-				Ability.PrintAuthorizeScript(url,authorizeScript, httpServletResponse);
-			}else{
-				chain.doFilter(request, response);
-			}
+			chain.doFilter(request, response);
 		}
 	}
 

@@ -74,10 +74,9 @@ public class LoginAction extends DispatchAction {
 	        	password_json = stuInfo.getString("password");
 	        	if(account_json.equals(account) && password_json.equals(password)){//账号和密码都要相同
 	        		result = "succ";
-	        		map.put("groupName", stuInfo.getString("groupName"));
-	        		map.put("moduleId", stuInfo.getString("moduleId"));
-	        		map.put("userName", stuInfo.getString("userName"));
 	        		request.getSession(false).setAttribute("userName", stuInfo.getString("userName"));
+	        		request.getSession(false).setAttribute("groupName", stuInfo.getString("groupName"));
+	        		request.getSession(false).setAttribute("moduleId", stuInfo.getString("moduleId"));
 	        		break;
 	        	}else{
 	        		result = "fail";
@@ -87,5 +86,39 @@ public class LoginAction extends DispatchAction {
 		map.put("result", result);
 		CommonTools.getJsonPkg(map, response);
 		return null;
+	}
+	
+	/**
+	 * 注销
+	 * @author wm
+	 * @date 2019-5-14 下午08:49:25 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward loginOut(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		request.getSession(false).invalidate();
+		return mapping.findForward("loginOut");
+	}
+	
+	/**
+	 * 导向注水合格率页面
+	 * @author wm
+	 * @date 2019-5-14 下午08:49:46 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward goZsPage(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		request.getSession(false).invalidate();
+		return mapping.findForward("zsPage");
 	}
 }
