@@ -113,7 +113,6 @@ public class CommonAction extends DispatchAction {
 	 */
 	public ActionForward goZsPage(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		request.getSession(false).invalidate();
 		return mapping.findForward("zsPage");
 	}
 	
@@ -349,7 +348,6 @@ public class CommonAction extends DispatchAction {
 	public ActionForward dealZsExcel(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Map<String,String> map_final = new HashMap<String,String>();
-		System.out.println("数据分析开始--"+CurrentTime.getCurrentTime());
 		Dba02Manager dm = (Dba02Manager) AppFactory.instance(null).getApp(Constants.WEB_DBA_02_INFO);
 		String excelName = Transcode.unescape_new1("excelName", request);//2019-04_sj.xlsx
 		String absoFilePath = WebUrl.DATA_URL_UP_FILE_UPLOAD + "/" + excelName;
@@ -606,10 +604,6 @@ public class CommonAction extends DispatchAction {
                 FileOutputStream fout = new FileOutputStream(absoFilePath);//存到服务器
             	xssfWorkbook.write(fout);  
                 fout.close(); 
-                
-                System.out.println("数据分析结束--"+CurrentTime.getCurrentTime());
-
-                System.out.println("增加注水合格率开始--"+CurrentTime.getCurrentTime());
                 String month = excelName.split("_")[0];
                 String s = null;
         		String dataPath = WebUrl.DATA_URL_JSON + "/hgl.json";
@@ -648,7 +642,6 @@ public class CommonAction extends DispatchAction {
             	out.write(newStr);
             	out.flush();
             	out.close();
-            	System.out.println("增加注水合格率结束--"+CurrentTime.getCurrentTime());
             	map_final.put("result", "success");
             }else{
             	map_final.put("result", "contentError");//文件内容格式错误

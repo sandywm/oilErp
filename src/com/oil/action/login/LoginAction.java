@@ -13,6 +13,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -73,9 +75,10 @@ public class LoginAction extends DispatchAction {
 	        	password_json = stuInfo.getString("password");
 	        	if(account_json.equals(account) && password_json.equals(password)){//账号和密码都要相同
 	        		result = "succ";
-	        		request.getSession(false).setAttribute("userName", stuInfo.getString("userName"));
-	        		request.getSession(false).setAttribute("groupName", stuInfo.getString("groupName"));
-	        		request.getSession(false).setAttribute("moduleId", stuInfo.getString("moduleId"));
+	        		HttpSession sess = request.getSession(false);
+	        		sess.setAttribute("userName", stuInfo.getString("userName"));
+	        		sess.setAttribute("groupName", stuInfo.getString("groupName"));
+	        		sess.setAttribute("moduleId", stuInfo.getString("moduleId"));
 	        		break;
 	        	}else{
 	        		result = "fail";
