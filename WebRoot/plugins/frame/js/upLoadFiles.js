@@ -25,12 +25,12 @@ layui.define(['element','jquery','upload','form'],function(exports){
 				  ,exts : 'xlsx'
 				  ,multiple: false
 				  ,auto: true
-				  ,number: maxNumber
+				  ,number:1
 				  ,errorMsg: function(content){
 				  	layer.msg(content, {icon: 2, shift: 6});
 				  }
 				 ,before : function(obj){
-					  var that = this,isFmxxTmpFlag = true;
+					  var that = this;
 					  //假如用户分了两次或者多次上传若个干文件，那么，用已经上传的文件和当前已经选中的文件的数量相加和maxNum做比较
 					  var hasUpDoneLen = $('.hasUpDone').length;
 					  var noUpDoneLen = $('.noUpDone').length;
@@ -42,7 +42,7 @@ layui.define(['element','jquery','upload','form'],function(exports){
 				  ,choose: function(obj){
 				  	  var that = this;
 				      obj.preview(function(index, file, result){ 
-				      	var files = that.files = obj.pushFile(); //将每次选择的文件追加到文件队列
+				      	//var files = that.files = obj.pushFile(); //将每次选择的文件追加到文件队列
 				      	var fileNames = file.name.split('.')[0]; 
 						var fileType = file.name.substr(file.name.lastIndexOf('.'));
 						var size = file.size;
@@ -75,14 +75,15 @@ layui.define(['element','jquery','upload','form'],function(exports){
 				  }
 				  ,done: function(res, index, upload){
 					layer.closeAll('loading');
-					console.log(res)
 				    if(res.msg == 'success'){ //上传成功
 				    	if(opts == 'impHglFile'){
 				    		//执行读取通知书 调出遮罩层	
 				    		succFileName = res.fileName;
-				    		parent.$('body').append(_this.data.indexLayer);
-							parent.$('body').find('.loadingWrap').html(_this.data.upSuccTips);
-							_this.showTime(3,parent.$('body').find('#countNum_up'),opts,false);
+				    		$('.indexLayer').show();
+				    		$('.loadingWrap').show();
+				    		//$('body').append(_this.data.indexLayer);
+							//$('body').find('.loadingWrap').html(_this.data.upSuccTips);
+							_this.showTime(3,'countNum_up',opts,false);
 				    	}
 				    }else if(res.msg == 'suffixError'){
 						layer.msg('上传文件格式必须是xlsx',{icon:5,anim:6,time:2000});
@@ -97,12 +98,14 @@ layui.define(['element','jquery','upload','form'],function(exports){
 		//倒计时
 		showTime : function(count,obj,opts,isReadSucFlag){
 			var _this = this,tmpUrl = '';
-			$(obj).html(count);
+			$('#'+obj).html(count);
 			if(count == 0){
 				if(isReadSucFlag){//批量读取成功
-					parent.$('body').find('.indexLayer').remove();
+					//parent.$('body').find('.indexLayer').remove();
 				}else{//上传成功，倒计时开始批量读取
-					parent.$('body').find('.loadingWrap').html(_this.data.readingTips);
+					//parent.$('body').find('.loadingWrap').html(_this.data.readingTips);
+					$('.upTipsTxt').hide();
+					$('.spinnerBox').show();
 					if(opts == 'impHglFile'){//读取通知书
 						tmpUrl = '/common.do?action=dealZsExcel';
 					}
@@ -126,7 +129,11 @@ layui.define(['element','jquery','upload','form'],function(exports){
 				url:tmpUrl,
 				success:function(json){
 					if(json['result'] == 'success'){
-						parent.$('body').find('.loadingWrap').html(_this.data.readSuccTips);
+						$('.downBtn').attr('filePath',fileName);
+						$('.upTipsTxt').hide();
+						$('.spinnerBox').hide();
+						$('.succBox').show();
+						//parent.$('body').find('.loadingWrap').html(_this.data.readSuccTips);
 						//_this.showTime(3,parent.$('body').find('#countNum'),_this.data.globalOpts,true);
 					}else if(json['result'] == 'contentError'){
 						layer.msg('上传文件内容格式错误',{icon:5,anim:6,time:2000});

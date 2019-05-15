@@ -8,6 +8,8 @@
 	<meta http-equiv="keywords" content="作业注水合格率">
 	<meta http-equiv="description" content="作业注水合格率">
 	<link href="/plugins/layui/css/layui.css" rel="stylesheet" type="text/css"/>
+	<link href="/css/common.css" rel="stylesheet" type="text/css"/>
+	<link href="/css/dottingAnimation.css" rel="stylesheet" type="text/css"/>
 	<link href="/plugins/pace/pace-theme-flash.min.css" rel="stylesheet" type="text/css"/>
 	<link href="/Module/shuizongManager/css/zuoyezhushui.css" rel="stylesheet" type="text/css"/>
 	<script src="/plugins/pace/pace.min.js" type="text/javascript"></script>	
@@ -80,10 +82,27 @@
 								<table id="hglTable" class="layui-table" lay-filter="hglTable"></table>
 							</div>
 						</div>
-						
   					</div>
 				</div>
 			</div>
+		</div>
+	</div>
+	<div class="indexLayer">
+		<div class="loadingWrap">
+			<p class="upTipsTxt">上传成功，<span id="countNum_up"></span>秒后开始自动读取</p>
+			<div class="spinnerBox">
+				<div class="spinner"></div>
+				<p>正在读取中<span class="dotting"></span></p><p>请勿刷新页面</p>
+			</div>
+			<div class="succBox">
+				<i class="layui-icon layui-icon-ok-circle readSucc"></i>
+				<p class="succTxt">读取成功!</p>
+				<p class="downTxt layui-clear">
+					<a class="closeBtn" href="javascript:void(0)">关闭</a>
+					<a class="downBtn" filePath="" href="javascript:void(0)">下载</a>
+				</p>
+			</div>
+			
 		</div>
 	</div>
 	<script src="/plugins/jquery/jquery.min.js"></script>
@@ -119,6 +138,17 @@
 				},
 				bindEvent : function(){
 					var _this = this;
+					$('.closeBtn').on('click',function(){
+						$('.indexLayer').hide();
+						$('.loadingWrap').hide();
+						$('.upTipsTxt').show();
+						$('.succBox').hide();
+						_this.loadHglResList();
+					});
+					$('.downBtn').on('click',function(){
+						var filePath = $(this).attr('filePath');
+						common.downFiles(filePath,0);
+					});
 					//注水信息查询
 					$('#queryBtn_list').on('click',function(){
 						var jhVal = $('.inpJhNum').val(),
@@ -175,8 +205,8 @@
 						where:field,
 						page : true,
 						even : true,
-						limit : 30,
-						limits:[10,20,30,40],
+						limit : 50,
+						limits:[10,20,30,40,50],
 						cellMinWidth : 150,
 						text: {none : '暂无相关数据'},
 						cols : [[

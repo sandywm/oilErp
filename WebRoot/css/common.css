@@ -68,7 +68,7 @@
 }
 .indexLayer{
 	background:rgba(0,0,0,.75);
-	/*display:none;*/
+	display:none;
 }
 .tmpIndexLayer{
 	background:rgba(0,0,0,.01);
@@ -83,6 +83,7 @@
 	margin-top:-60px;
 	z-index:10000;
 	text-align:center;
+	display:none;
 }
 .loadingWrap p{
 	color:#fff;
@@ -117,6 +118,10 @@
 }
 .upTipsTxt{
 	line-height:120px;
+}
+.spinnerBox,
+.succBox{
+	display:none;
 }
 @keyframes blink{
   0% {opacity: 1;}

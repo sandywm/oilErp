@@ -14,7 +14,8 @@
 	<link href="/plugins/pace/pace-theme-flash.min.css" rel="stylesheet" type="text/css"/>
 	<script src="/plugins/pace/pace.min.js"></script>
 	<script type="text/javascript">
-		var groupname = "${sessionScope.groupname}";
+		var groupName = "${sessionScope.groupName}";
+		var userName = "${sessionScope.userName}";
 	</script>
   </head>
   
@@ -42,19 +43,20 @@
 					    });
 					    tpwidget("show");</script>
   				</li>
-	            <li class="layui-nav-item">
-	                <a href="javascript:;">
+  				 <li class="layui-nav-item">
+	                <a href="javascript:;" style="cursor:default;">
 	                	<i class="layui-icon layui-icon-username headsmIcon"></i>
-	                   	<span id="userName">黄利峰</span><span class="layui-nav-more"></span>
+	                   	<span id="userName"></span>
 	                </a>
-	                <dl class="layui-nav-child">
-	                    <dd class="navLi"><a href="javascript:void(0)" tab-id="1" path="user.do?action=goUserDetailPage">基本资料</a></dd>
-	                    <dd class="navLi"><a href="javascript:void(0)" tab-id="2" path="user.do?action=goUpdatePassPage">密码设置</a></dd>
-	                </dl>
+	            </li>
+  				<li class="layui-nav-item">
+	                <a href="javascript:;" style="cursor:default;">
+	                   	<span id="groupName"></span>
+	                </a>
 	            </li>
 	            <li class="tuichu">
 	            	 <a id="loginOut" href="javascript:;" title="退出">
-	            	 	<i class="iconfont layui-extend-tuichu"></i>
+	            	 	<i class="iconfont icon-tuichu"></i>
 	            	 </a>
 	            </li>
 	    	</ul>
@@ -63,10 +65,10 @@
   			<div class="layui-side-scroll">
   				<!-- 左侧导航区域（可配合layui已有的垂直导航） -->
   				<ul id="leftSideNav" class="layui-nav layui-nav-tree" lay-fliter="leftSideNav">
-  					<li class="layui-nav-item navLi"><a href="javascript:void(0)" path="common.do?action=goZsPage" tab-id="1">作业注水合格率</a></li>
-  					<li class="layui-nav-item navLi"><a href="javascript:void(0)" path="youzongtiaopei.html" tab-id="2">油综调配见效率</a></li>
+  					<li class="layui-nav-item navLi layui-this"><a href="javascript:void(0)" path="common.do?action=goZsPage" tab-id="1">作业注水合格率</a></li>
+  					<!--  li class="layui-nav-item navLi"><a href="javascript:void(0)" path="youzongtiaopei.html" tab-id="2">油综调配见效率</a></li>
   					<li class="layui-nav-item navLi"><a href="javascript:void(0)" path="shuizongtiaopei.html" tab-id="3">水综调配方案</a></li>
-  					<li class="layui-nav-item navLi"><a href="javascript:void(0)" path="shuizongcengduan.html" tab-id="4">水综层段合格率</a></li>
+  					<li class="layui-nav-item navLi"><a href="javascript:void(0)" path="shuizongcengduan.html" tab-id="4">水综层段合格率</a></li-->
   				</ul>
   			</div>
   		</div>
@@ -93,6 +95,8 @@
   	<script src="/plugins/jquery/jquery.min.js"></script>
   	<script src="/plugins/layui/layui.js"></script>
   	<script type="text/javascript">
+  		$('#userName').html(userName);
+  		$('#groupName').html('科室：' + groupName)
 	  	layui.use(['element','layer'], function(){
 	 		 //动态加载模块
 	       var element = layui.element,
@@ -151,9 +155,15 @@
 				layer.closeAll('tips'); 
 			});
 	   });
-	  	function closeLayer(){
-	  		alert("-------")
-	  	}
+  		$("#loginOut").on('click',function(){
+			layer.confirm('确认退出系统么？', {
+			  title:'提示',
+			  skin: 'layui-layer-molv',
+			  btn: ['确定','取消'] //按钮
+			},function(){
+				window.location.href = "login.do?action=loginOut";
+			});
+		});
   	</script>
   </body>
 </html>
