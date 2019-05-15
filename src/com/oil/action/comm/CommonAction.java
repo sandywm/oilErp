@@ -514,7 +514,12 @@ public class CommonAction extends DispatchAction {
     			cell.setCellStyle(style);
     			cell.setCellValue(hgNum);
     			
-    			String hgRate = Convert.convertInputNumber_1(Integer.parseInt(hgNum) * 100.0 / Integer.parseInt(comNum));
+    			String hgRate = "";
+    			if(Integer.parseInt(comNum) > 0){
+    				hgRate = Convert.convertInputNumber_1(Integer.parseInt(hgNum) * 100.0 / Integer.parseInt(comNum));
+    			}else{
+    				hgRate = "0.00";
+    			}
     			cell = row_tj.createCell(3);
     			style.setFont(font_1);
     			cell.setCellStyle(style);
@@ -542,7 +547,12 @@ public class CommonAction extends DispatchAction {
 			cell.setCellStyle(style);
 			cell.setCellValue(String.valueOf(hgNum_total));
 			
-			String hgRate = Convert.convertInputNumber_1(hgNum_total * 100.0 / comNum_total);
+			String hgRate = "";
+			if(comNum_total > 0){
+				hgRate = Convert.convertInputNumber_1(hgNum_total * 100.0 / comNum_total);
+			}else{
+				hgRate = "0.00";
+			}
 			cell = row_tj.createCell(3);
 			style.setFont(font_1);
 			cell.setCellStyle(style);
@@ -697,7 +707,7 @@ public class CommonAction extends DispatchAction {
         JSONArray features = dataJson.getJSONArray("excelList");// 找到features json数组
         Map<String,Object> map = new HashMap<String,Object>();
         List<Object> list_d = new ArrayList<Object>();
-        String msg = "noInfo";
+        String msg = "暂无记录";
         for(Integer i = 0 ; i < features.size() ; i++){
         	JSONObject obj = features.getJSONObject(i);// 获取features数组的第i个json对象
         	Map<String,String> map_d = new HashMap<String,String>();
@@ -714,9 +724,11 @@ public class CommonAction extends DispatchAction {
         	}
         }
         if(msg.equals("success")){
-        	map.put("fileList", list_d);
+        	map.put("data", list_d);
         }
-        map.put("result", msg);
+        map.put("msg", msg);
+		map.put("count", features.size());
+		map.put("code", 0);
         CommonTools.getJsonPkg(map, response);
 		return null;
 	}
