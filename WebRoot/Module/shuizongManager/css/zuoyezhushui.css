@@ -1,0 +1,78 @@
+.itemDivs{
+	float: left;
+	margin-right: 10px;
+	position:relative;
+}
+.itemDivs strong.yearTxt{
+	font-size:16px;
+	position:absolute;
+	right:11px;
+	top:8px;
+	color:#F47837;
+}
+.itemDivs input#yearInp{
+	color: #34495e;
+	font-weight: 600;
+}
+.tipsTxt{
+	color: #999;
+    text-align: center;
+    margin:80px 0;
+}
+.symbol,
+.inpNum,
+.resetBtn{
+	float: left;
+}
+.resetBtn{
+	margin:6px 0 0 10px;
+}
+.resetBtn:hover{
+	color:#F47837;
+}
+table{
+	margin:0 !important;
+}
+.symbol{
+	width: 30px;
+	height: 36px;
+	line-height: 36px;
+	border:1px solid #e6e6e6;
+	display: block;
+	text-align: center;
+	border-radius: 2px 0 0 2px;
+	border-right: none;
+	font-size: 18px;
+	color: #F47837;
+	font-weight: 600;
+}
+.inpJhNum{
+	width: 80%;
+	border-radius: 0 2px 2px 0;
+	color: #34495e;
+	font-weight: 600;
+}
+.inpJhNum::-webkit-input-placeholder{
+	font-weight: normal;
+}
+.dateBox span{
+	margin:0 5px;
+	color: #666;
+}
+.jinghao{
+	margin:0 5px;
+	color:#F47837;
+}
+.addFileBox{
+	float:right;
+}
+.addFileBox a{
+	position:relative;
+	text-align:left;
+	text-indent:15px;
+}
+.addFileBox a i{
+	position:absolute;
+	left:-4px;
+	font-size:22px !important;
+}
