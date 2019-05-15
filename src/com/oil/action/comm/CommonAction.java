@@ -85,6 +85,23 @@ public class CommonAction extends DispatchAction {
 	}
 	
 	/**
+	 * 登录进来首页
+	 * @author wm
+	 * @date 2019-5-15 上午08:43:37
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward welcome(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		request.getSession(false).invalidate();
+		return mapping.findForward("welcome");
+	}
+	
+	/**
 	 * 导向注水合格率页面
 	 * @author wm
 	 * @date 2019-5-14 下午08:49:46 
