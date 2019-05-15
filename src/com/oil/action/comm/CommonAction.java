@@ -97,7 +97,6 @@ public class CommonAction extends DispatchAction {
 	 */
 	public ActionForward welcome(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		request.getSession(false).invalidate();
 		return mapping.findForward("welcome");
 	}
 	
@@ -178,16 +177,20 @@ public class CommonAction extends DispatchAction {
 			map.put("count", count);
 			map.put("code", 0);
 			//统计信息
-			map.put("井号", dList.get(0).getJh());
-			map.put("注水天数", zsDays);
-			map.put("合格天数", hgDays);
-			DecimalFormat df = new DecimalFormat("0.00");
-			Double hg = hgDays * 100.0 / zsDays;
-			map.put("合格率", df.format(hg) + "%");
-			if(hg >= 80){
-				map.put("结论", "合格");
+			map.put("jh_tj", dList.get(0).getJh());
+			map.put("zsDays", zsDays);
+			map.put("hgDays", hgDays);
+			if(zsDays > 0){
+				Double hg = hgDays * 100.0 / zsDays;
+				map.put("hgRate", Convert.convertInputNumber_2(hg) + "%");
+				if(hg >= 80){
+					map.put("result", "合格");
+				}else{
+					map.put("result", "不合格");
+				}
 			}else{
-				map.put("结论", "不合格");
+				map.put("hgRate", "0.00%");
+				map.put("result", "不合格");
 			}
 		}
 		map.put("msg", msg);
