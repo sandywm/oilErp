@@ -596,7 +596,7 @@ public class CommonAction extends DispatchAction {
         appObject.put("month", month);
         appObject.put("fxDate", CurrentTime.getCurrentTime());
         appObject.put("year", month.split("-")[0]);
-        appObject.put("filePath", WebUrl.NEW_DATA_URL_UP_FILE_UPLOAD + "/" + excelName);
+        appObject.put("filePath", excelName);
         
         String newStr = "";
         if(s.equals("")){//新增加
