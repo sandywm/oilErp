@@ -36,7 +36,7 @@ public class CheckImage
      */
     public String getUpFileStuffix(String suffix){
     	suffix = suffix.toLowerCase();
-    	String gzStr = "xls,xlsx";
+    	String gzStr = "xlsx";
     	String fileType = "";
     	if(gzStr.indexOf(suffix) >= 0){
     		fileType = "file";
