@@ -137,8 +137,20 @@ layui.define(['element','jquery','upload','form'],function(exports){
 						//_this.showTime(3,parent.$('body').find('#countNum'),_this.data.globalOpts,true);
 					}else if(json['result'] == 'contentError'){
 						layer.msg('上传文件内容格式错误',{icon:5,anim:6,time:2000});
+						
+						$('.indexLayer').hide();
+						$('.loadingWrap').hide();
+						$('.upTipsTxt').hide();
+						$('.spinnerBox').hide();
+						$('.succBox').hide();
 					}else if(json['result'] == 'sheetError'){
 						layer.msg('上传文件中必须包含2个工作表',{icon:5,anim:6,time:2000});
+						
+						$('.indexLayer').hide();
+						$('.loadingWrap').hide();
+						$('.upTipsTxt').hide();
+						$('.spinnerBox').hide();
+						$('.succBox').hide();
 					}
 				}
 			});
