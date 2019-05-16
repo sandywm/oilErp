@@ -61,6 +61,7 @@ import com.oil.action.base.Transcode;
 import com.oil.tools.Convert;
 import com.oil.tools.CheckImage;
 import com.oil.tools.CurrentTime;
+import com.oil.tools.FileOpration;
 import com.oil.util.WebUrl;
 import com.oil.page.PageConst;
 
@@ -726,6 +727,9 @@ public class CommonAction extends DispatchAction {
 		// TODO Auto-generated method stub
 		String specYear = CommonTools.getFinalStr("specYear", request);
 		String s = null;
+		String msg = "暂无记录";
+		Integer count = 0;
+		Map<String,Object> map = new HashMap<String,Object>();
 		File file = new File(WebUrl.DATA_URL_JSON + "/hgl.json");
 		InputStreamReader br = new InputStreamReader(new FileInputStream(file),"utf-8");//读取文件,同时指定编码
 		StringBuffer sb = new StringBuffer();
@@ -735,30 +739,33 @@ public class CommonAction extends DispatchAction {
             sb.append(ch, 0, len);
         }
         s = sb.toString();
-        JSONObject dataJson = JSON.parseObject(s); 
-        JSONArray features = dataJson.getJSONArray("excelList");// 找到features json数组
-        Map<String,Object> map = new HashMap<String,Object>();
-        List<Object> list_d = new ArrayList<Object>();
-        String msg = "暂无记录";
-        Integer count = 0;
-        for(Integer i = 0 ; i < features.size() ; i++){
-        	JSONObject obj = features.getJSONObject(i);// 获取features数组的第i个json对象
-        	Map<String,String> map_d = new HashMap<String,String>();
-        	String year = obj.getString("year");//获取年份
-        	if(year.equals(specYear)){
-        		msg = "success";
-        		map_d.put("fileName", obj.getString("fileName"));
-        		map_d.put("month", obj.getString("month"));
-        		map_d.put("fxDate", obj.getString("fxDate"));
-        		map_d.put("filePath", obj.getString("filePath"));
-        		list_d.add(map_d);
-        		count++;
-        	}else{
-        		continue;
-        	}
-        }
-        if(msg.equals("success")){
-        	map.put("data", list_d);
+        if(!s.equals("")){
+        	JSONObject dataJson = JSON.parseObject(s); 
+            JSONArray features = dataJson.getJSONArray("excelList");// 找到features json数组
+            List<Object> list_d = new ArrayList<Object>();
+            for(Integer i = 0 ; i < features.size() ; i++){
+            	JSONObject obj = features.getJSONObject(i);// 获取features数组的第i个json对象
+            	Map<String,String> map_d = new HashMap<String,String>();
+            	String year = String.valueOf(obj.getString("year"));//获取年份
+            	if(!year.equals("null")){
+            		if(year.equals(specYear)){
+                		msg = "success";
+                		map_d.put("fileName", obj.getString("fileName"));
+                		map_d.put("month", obj.getString("month"));
+                		map_d.put("fxDate", obj.getString("fxDate"));
+                		map_d.put("filePath", obj.getString("filePath"));
+                		list_d.add(map_d);
+                		count++;
+                	}else{
+                		continue;
+                	}
+            	}else{
+            		continue;
+            	}
+            }
+            if(msg.equals("success")){
+            	map.put("data", list_d);
+            }
         }
         map.put("msg", msg);
 		map.put("count", count);
@@ -767,4 +774,60 @@ public class CommonAction extends DispatchAction {
 		return null;
 	}
 	
+	/**
+	 * 删除指定分析记录
+	 * @author wm
+	 * @date 2019-5-16 下午10:44:41 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward delHglData(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// TODO Auto-generated method stub
+		String fileName = Transcode.unescape_new1("fileName", request);
+		String s = null;
+		File file = new File(WebUrl.DATA_URL_JSON + "/hgl.json");
+		InputStreamReader br = new InputStreamReader(new FileInputStream(file),"utf-8");//读取文件,同时指定编码
+		StringBuffer sb = new StringBuffer();
+        char[] ch = new char[128];  //一次读取128个字符
+        int len = 0;
+        while((len = br.read(ch,0, ch.length)) != -1){
+            sb.append(ch, 0, len);
+        }
+        String msg = "error";
+        s = sb.toString();
+        JSONObject dataJson = JSON.parseObject(s); 
+        JSONArray features = dataJson.getJSONArray("excelList");// 找到features json数组
+        Map<String,String> map = new HashMap<String,String>();
+        for(Integer i = 0 ; i < features.size() ; i++){
+        	JSONObject obj = features.getJSONObject(i);// 获取features数组的第i个json对象
+        	String fileName_json = String.valueOf(obj.getString("fileName"));//获取文件名称
+        	if(!fileName_json.equals("null")){
+        		if(fileName_json.equals(fileName)){
+        			//删除服务器上对应的数据文件
+            		FileOpration.deleteFile(WebUrl.DATA_URL_UP_FILE_UPLOAD + "/" + obj.getString("filePath"));
+            		obj.clear();
+            		msg = "success";
+            		break;
+            	}
+        	}
+        }
+        if(msg.equals("success")){
+        	String jsonStr = dataJson.toString();
+            Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+            out.write(jsonStr);
+        	out.flush();
+        	out.close();
+        }else{
+        	msg = "success";
+        }
+    	br.close();
+    	map.put("result", msg);
+        CommonTools.getJsonPkg(map, response);
+		return null;
+	}
 }
