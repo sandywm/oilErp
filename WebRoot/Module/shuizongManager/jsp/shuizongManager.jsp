@@ -215,7 +215,10 @@
 							{field : 'fxDate', title: '分析日期',align:'center'},
 							{field : 'month', title: '月份',align:'center'},
 							{field : '', title: '操作',align:'center',templet:function(d){
-								return '<a href="javascript:void(0)" class="layui-btn layui-btn-xs" lay-event="download" filePath="'+ d.filePath +'"><i class="layui-icon layui-icon-download-circle"></i>下载</a>';
+								var str = '';
+								str += '<a href="javascript:void(0)" class="layui-btn layui-btn-xs" lay-event="download" filePath="'+ d.filePath +'"><i class="layui-icon layui-icon-download-circle"></i>下载</a>';
+								str += '<a href="javascript:void(0)" class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete" fileName="'+ d.fileName +'"><i class="layui-icon layui-icon-delete"></i>删除</a>';
+								return str;
 							}}
 							
 						]],
@@ -227,6 +230,29 @@
 						if(obj.event == 'download'){//下载合格率文件
 							var filePath = $(this).attr('filePath');
 							common.downFiles(filePath,0);
+						}else if(obj.event == 'delete'){
+							var fileName = $(this).attr('fileName');
+							layer.confirm('确定要删除文件[<span style="color:#F47837">' + fileName + '</span>]?',{
+								title:'删除文件?',
+							  	skin: 'layui-layer-molv',
+							  	btn: ['确定','取消'] //按钮
+							},function(){
+								layer.load('1');
+								$.ajax({
+			    					type:'post',
+			    			        dataType:'json',
+			    			        data : {fileName : fileName},
+			    			        url:'/common.do?action=delHglData',
+			    			        success:function (json){
+			    			        	layer.closeAll('loading');	
+			    			        	if(json['result'] == 'success'){
+			    			        		layer.msg('删除成功',{icon:1,time:1500},function(){
+			    			        			page.loadHglResList();
+			    			        		});
+			    			        	}
+			    			        }
+			    				});
+							});
 						}
 					});
 				},
