@@ -86,7 +86,7 @@ public class CommonAction extends DispatchAction {
 	}
 	
 	/**
-	 * 登录进来首页
+	 * 登录进来首页1
 	 * @author wm
 	 * @date 2019-5-15 上午08:43:37
 	 * @param mapping
