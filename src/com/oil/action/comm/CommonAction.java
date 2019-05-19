@@ -141,11 +141,11 @@ public class CommonAction extends DispatchAction {
 			Integer pageSize = PageConst.getPageSize(String.valueOf(request.getParameter("limit")), 10);//等同于pageSize
 			Integer pageNo = CommonTools.getFinalInteger("page", request);//等同于pageNo
 			List<Dba02> dList = dm.listSjPageInfoByOpt(jh, sDate, eDate, pageNo, pageSize);
-			List<Dba02> dList_zsts = dm.listSjInfo(jh, sDate, eDate,false);
+			List<Dba02> dList_zsts = dm.listValideZsInfoByOpt(jh, sDate, eDate);
 			List<Dba02> dList_hgts = dm.listSjInfo(jh, sDate, eDate,true);
 			//获取第一条数据的日期
 			Integer hgDays = dList_hgts.size();//合格天数
-			Integer zsDays = dList_zsts.size();//注水天数
+			Integer zsDays = dList_zsts.size();//注水天数;//注水天数
 			List<Object> list_d = new ArrayList<Object>();
 			for(Iterator<Dba02> it = dList.iterator() ; it.hasNext();){
 				Dba02 dba = it.next();
@@ -455,17 +455,22 @@ public class CommonAction extends DispatchAction {
                 		
                 	}
                 	if(!sDate.equals("") && !eDate.equals("")){
-                		List<Dba02> dList_zs = dm.listSjInfo(jh,sDate,eDate,false);
+                		List<Dba02> dList_zsts = dm.listValideZsInfoByOpt(jh, sDate, eDate);
                 		List<Dba02> dList_hg = dm.listSjInfo(jh,sDate,eDate,true);
                 		Map<String,Object> map = new HashMap<String,Object>();
-                		if(dList_zs.size() > 0){
+//                		if(dList_zs.size() > 0){
                 			//获取第一条数据的日期
                 			Integer hgDays = dList_hg.size();//合格天数
-                			Integer zsDays = dList_zs.size();//注水天数
+                			Integer zsDays = dList_zsts.size();//注水天数
                 			DecimalFormat df = new DecimalFormat("0.00");
-                			Double hg = hgDays * 100.0 / zsDays;
-                			map.put("合格率", df.format(hg) + "%");
-                			
+                			Double hg = 0.0;
+                			if(zsDays > 0){
+                				 hg = hgDays * 100.0 / zsDays;
+                				 map.put("合格率", df.format(hg) + "%");
+                			}else{
+                				map.put("合格率", "0.00%");
+                			}
+
                 			XSSFCell cell = row1.createCell(4);//注水天数
                 			style.setFont(font_1);
                 			cell.setCellStyle(style);
@@ -502,9 +507,9 @@ public class CommonAction extends DispatchAction {
                 					map_d.put("comNum_"+curr_unit, "1,0");//完井井数
                 				}
                 			}
-                		}else{
-                			continue;
-                		}
+//                		}else{
+//                			continue;
+//                		}
                 	}
                 }
                 if(map_d.size() > 0){

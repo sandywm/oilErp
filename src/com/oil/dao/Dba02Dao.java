@@ -32,4 +32,14 @@ public interface Dba02Dao {
 	 * @return
 	 */
 	Integer getSjCountByOpt(Session sess,String jh,String sDate,String eDate);
+	
+	/**
+	 * 获取指定井号、指定时间段的有效注水天数
+	 * @param sess
+	 * @param jh 井号
+	 * @param sDate 开始日期
+	 * @param eDate 结束日期
+	 * @return
+	 */
+	List<Dba02> findValideZsInfoByOpt(Session sess,String jh,String sDate,String eDate);
 }

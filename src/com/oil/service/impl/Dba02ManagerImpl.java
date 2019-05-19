@@ -64,4 +64,20 @@ public class Dba02ManagerImpl implements Dba02Manager{
 		}
 	}
 
+	@Override
+	public List<Dba02> listValideZsInfoByOpt(String jh, String sDate, String eDate)  throws WEBException{
+		// TODO Auto-generated method stub
+		try {
+			Dba02Dao dba02Dao = (Dba02Dao) DaoFactory.instance(null).getDao(Constants.DAO_DBA_02_INFO);
+			Session sess = HibernateUtil.currentSession();
+			return dba02Dao.findValideZsInfoByOpt(sess, jh, sDate, eDate);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new WEBException("获取指定井号、指定时间段的有效注水天数时出现异常!");
+		} finally{
+			HibernateUtil.closeSession();
+		}
+	}
+
 }

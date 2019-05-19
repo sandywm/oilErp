@@ -8,7 +8,7 @@
 
 	<session-factory>
 		<property name="show_sql">false</property>
-		<!--property name="hibernate.connection.driver_class">
+		<property name="hibernate.connection.driver_class">
 			oracle.jdbc.driver.OracleDriver
 		</property>
 		<property name="hibernate.connection.username">cyrc</property>
@@ -17,17 +17,17 @@
 		</property>
 		<property name="hibernate.connection.url">
 			jdbc:oracle:thin:@10.75.208.11:1521:ora9i
-		</property-->
-		<property name="connection.driver_class">
-			com.mysql.jdbc.Driver
 		</property>
+		<!--property name="connection.driver_class">
+			com.mysql.jdbc.Driver
+		</property-->
 		<!-- ?useUnicode=true&amp;characterEncoding=utf-8 -->
 		<!-- 目的是为了防止数据库查询不到条件为中文时的记录 -->
-		<property name="connection.url">
+		<!--property name="connection.url">
 			jdbc:mysql://127.0.0.1:3306/zsd?useUnicode=true&amp;characterEncoding=utf-8
 		</property>
 		<property name="connection.username">sandy</property>
-		<property name="connection.password">123456</property>
+		<property name="connection.password">123456</property-->
 		<!-- C3P0 connection pool  -->
 		<property name="hibernate.connection.provider_class">
 			org.hibernate.connection.C3P0ConnectionProvider
@@ -51,8 +51,8 @@
 			org.hibernate.hql.classic.ClassicQueryTranslatorFactory
 		</property>
 		<property name="dialect">
-			<!-- org.hibernate.dialect.Oracle9iDialect-->
-			org.hibernate.dialect.ExtendedMySQLDialect
+			org.hibernate.dialect.Oracle9iDialect
+			<!-- org.hibernate.dialect.ExtendedMySQLDialect-->
 		</property>
 		<!-- 允许Hibernate使用JDBC2的批量更新最大条数 -->
 		<property name="hibernate.jdbc.batch_size">30</property>

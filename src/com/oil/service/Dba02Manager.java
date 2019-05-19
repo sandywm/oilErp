@@ -2,6 +2,8 @@ package com.oil.service;
 
 import java.util.List;
 
+import org.hibernate.Session;
+
 import com.oil.exception.WEBException;
 import com.oil.module.Dba02;
 
@@ -30,4 +32,13 @@ public interface Dba02Manager {
 	 * @throws WEBException
 	 */
 	Integer getSjCountByOpt(String jh,String sDate,String eDate) throws WEBException;
+	
+	/**
+	 * 获取指定井号、指定时间段的有效注水天数
+	 * @param jh 井号
+	 * @param sDate 开始日期
+	 * @param eDate 结束日期
+	 * @return
+	 */
+	List<Dba02> listValideZsInfoByOpt(String jh,String sDate,String eDate) throws WEBException;
 }
