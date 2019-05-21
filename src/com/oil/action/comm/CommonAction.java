@@ -183,7 +183,7 @@ public class CommonAction extends DispatchAction {
 			if(zsDays > 0){
 				Double hg = hgDays * 100.0 / zsDays;
 				map.put("hgRate", Convert.convertInputNumber_2(hg) + "%");
-				if(hg >= 80){
+				if(hg >= 85){
 					map.put("result", "合格");
 				}else{
 					map.put("result", "不合格");
@@ -266,6 +266,10 @@ public class CommonAction extends DispatchAction {
 		boolean upFlag = false;
 		String fileUrl = "";
 		String filename = "";
+		String opt = CommonTools.getFinalStr("opt", request);//opt:zs(注水合格率),cd(层段合格率)
+		if(opt.equals("")){
+			opt = "zs";//默认为注水
+		}
 		Map<String,Object> map = new HashMap<String,Object>();
 		
 			if (ServletFileUpload.isMultipartContent(request)){// 判断是否是上传文件
@@ -285,8 +289,15 @@ public class CommonAction extends DispatchAction {
 						filePre = filename.substring(0, lastIndex);
 						String rqPre = filePre.split("_")[0];
 						boolean flag = false;
-						if(rqPre.length() == 7){
+						if(rqPre.length() == 7 && opt.equals("zs")){
 							flag = CurrentTime.checkValidDate(rqPre);
+						}else if(rqPre.length() == 21 && opt.equals("cd")){//层段时
+							//2019-03-01~2019-03-31
+							if(CurrentTime.checkValidDate_1(rqPre.split("~")[0]) && CurrentTime.checkValidDate_1(rqPre.split("~")[1])){
+								if(CurrentTime.compareDate(rqPre.split("~")[0], rqPre.split("~")[1]) >= 0){
+									flag = true;
+								}
+							}
 						}
 						if(flag){
 							filename = filePre + "_" + CurrentTime.getRadomTime() + "." + suffix;
@@ -488,7 +499,7 @@ public class CommonAction extends DispatchAction {
                 			
                 			cell = row1.createCell(7);//结论
                 			String com_num = map_d.get("comNum_"+curr_unit) == null ? "" : map_d.get("comNum_"+curr_unit);//完井数,合格数
-                			if(hg >= 80){
+                			if(hg >= 85){
                 				style_pass.setFont(font_pass);
                 				cell.setCellStyle(style_pass);
                 				cell.setCellValue("合格");
@@ -694,6 +705,7 @@ public class CommonAction extends DispatchAction {
         appObject.put("fxDate", CurrentTime.getCurrentTime());
         appObject.put("year", month.split("-")[0]);
         appObject.put("filePath", filePath);
+        appObject.put("uploadUser", this.getLoginUserName(request));
         
         String newStr = "";
         if(s.equals("")){//新增加
@@ -753,7 +765,7 @@ public class CommonAction extends DispatchAction {
             	Map<String,String> map_d = new HashMap<String,String>();
             	String year = String.valueOf(obj.getString("year"));//获取年份
             	if(!year.equals("null")){
-            		if(year.equals(specYear)){
+            		if(year.equals(specYear) && (obj.getString("uploadUser").equals(this.getLoginUserName(request)))){
                 		msg = "success";
                 		map_d.put("fileName", obj.getString("fileName"));
                 		map_d.put("month", obj.getString("month"));
@@ -835,4 +847,167 @@ public class CommonAction extends DispatchAction {
         CommonTools.getJsonPkg(map, response);
 		return null;
 	}
+	
+	/**
+	 * 处理层段合格率
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward dealCdHglExcel(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		System.out.println("分析层段合格率开始--"+CurrentTime.getCurrentTime());
+		Map<String,String> map_final = new HashMap<String,String>();
+		Dba02Manager dm = (Dba02Manager) AppFactory.instance(null).getApp(Constants.WEB_DBA_02_INFO);
+		String excelName = Transcode.unescape_new1("excelName", request);//2019-04_sj.xlsx
+		String absoFilePath = WebUrl.DATA_URL_UP_FILE_UPLOAD + "/" + excelName;
+		String specDateRange = excelName.substring(0, excelName.indexOf("_"));//指定期限2019-03-01~2019-03-31_层段合格率.xlsx
+		String sDate = specDateRange.split("~")[0];
+		String eDate = specDateRange.split("~")[1];
+		File f = new File(absoFilePath);
+    	InputStream inputStream = new FileInputStream(f);
+    	XSSFWorkbook xssfWorkbook = new XSSFWorkbook(inputStream);
+    	Integer sheetNum = xssfWorkbook.getNumberOfSheets();
+    	if(sheetNum.equals(1)){
+    		XSSFSheet sheet = xssfWorkbook.getSheetAt(0);
+        	XSSFCellStyle style = xssfWorkbook.createCellStyle();  
+            style.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式  
+            style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);  
+            style.setBorderBottom(XSSFCellStyle.BORDER_THIN); //下边框    
+            style.setBorderLeft(XSSFCellStyle.BORDER_THIN);//左边框    
+            style.setBorderTop(XSSFCellStyle.BORDER_THIN);//上边框    
+            style.setBorderRight(XSSFCellStyle.BORDER_THIN);//右边框 
+            
+            XSSFFont font_1 = xssfWorkbook.createFont();    
+            font_1.setFontName("宋体");    
+            font_1.setFontHeightInPoints((short) 12);//设置字体大小  (备注)
+            style.setFont(font_1);
+            
+            XSSFCellStyle style_pass = xssfWorkbook.createCellStyle();  
+            style_pass.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式  
+            style_pass.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);  
+            style_pass.setBorderBottom(XSSFCellStyle.BORDER_THIN); //下边框    
+            style_pass.setBorderLeft(XSSFCellStyle.BORDER_THIN);//左边框    
+            style_pass.setBorderTop(XSSFCellStyle.BORDER_THIN);//上边框    
+            style_pass.setBorderRight(XSSFCellStyle.BORDER_THIN);//右边框 
+            
+            XSSFCellStyle style_no_pass = xssfWorkbook.createCellStyle();  
+            style_no_pass.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式  
+            style_no_pass.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);  
+            style_no_pass.setBorderBottom(XSSFCellStyle.BORDER_THIN); //下边框    
+            style_no_pass.setBorderLeft(XSSFCellStyle.BORDER_THIN);//左边框    
+            style_no_pass.setBorderTop(XSSFCellStyle.BORDER_THIN);//上边框    
+            style_no_pass.setBorderRight(XSSFCellStyle.BORDER_THIN);//右边框 
+            
+            XSSFCellStyle style_tj = xssfWorkbook.createCellStyle();  
+            style_tj.setAlignment(HSSFCellStyle.ALIGN_LEFT); // 创建一个居左格式  
+            style_tj.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);  
+            style_tj.setBorderBottom(XSSFCellStyle.BORDER_THIN); //下边框    
+            style_tj.setBorderLeft(XSSFCellStyle.BORDER_THIN);//左边框    
+            style_tj.setBorderTop(XSSFCellStyle.BORDER_THIN);//上边框    
+            style_tj.setBorderRight(XSSFCellStyle.BORDER_THIN);//右边框 
+            
+            XSSFFont font_pass = xssfWorkbook.createFont();    
+            font_pass.setFontName("宋体");    
+            font_pass.setFontHeightInPoints((short) 12);//设置字体大小  (备注)
+            font_pass.setColor(HSSFColor.GREEN.index);
+            
+            XSSFFont font_no_pass = xssfWorkbook.createFont();    
+            font_no_pass.setFontName("宋体");    
+            font_no_pass.setFontHeightInPoints((short) 12);//设置字体大小  (备注)
+            font_no_pass.setColor(HSSFColor.RED.index);
+            
+            style_pass.setFont(font_pass);
+            style_no_pass.setFont(font_no_pass);
+            
+            XSSFRow row0 = sheet.getRow(0);
+            String jh0 = row0.getCell(0).getStringCellValue().replace(" ", "").replace("\t", "");//井号
+            if(jh0.equals("井号")){
+            	for (int i = 1; i < sheet.getLastRowNum()+1; i++) {
+                	XSSFRow row1 = sheet.getRow(i);
+                	String jh = row1.getCell(0).getStringCellValue().replace(" ", "").replace("\t", "");//井号
+                	if(jh.equals("")){
+                		 break; 
+                	}
+                	List<Dba02> hgList = dm.listSjInfo(jh, sDate, eDate, true);//合格列表
+                	List<Dba02> zsList = dm.listValideZsInfoByOpt(jh, sDate, eDate);//注水记录列表--生产时间大于0即可
+                	String db = "";//队别1
+                	String zsfs = "";//注水方式1
+                	Integer hgDays = hgList.size();//合格天数1
+                	Integer hgZsNum_total = 0;//合格总注水量
+                	Integer zsDays = zsList.size();//注水天数1
+                	Integer zsNum_total = 0;//总注水量1
+                	String jl = "";//结论
+                	String yy_text = "";//油压 < 17-常压,17-30中压,>31高压
+                	if(zsList.size() > 0){
+                		Dba02 dba = zsList.get(0);
+                		db = dba.getDb();
+                		zsfs = dba.getZsfs();
+                	}
+                	Double hgl =0.0;//合格率
+                	if(zsDays > 0){
+                		hgl = Convert.convertInputNumber_2(hgDays * 100.0 / zsDays);//合格率
+                	}
+                	if(hgl >= 90 && hgl <= 110){
+                		jl = "合格";
+                	}else{
+                		jl = "不合格";
+                	}
+                	Integer zcyNum = 0;
+                	Integer zyNum = 0;
+                	Integer gyNum = 0;
+                	for(Iterator<Dba02> it = zsList.iterator() ; it.hasNext();){
+                		Dba02 dba = it.next();
+                		zsNum_total += dba.getRzsl();
+                		Double yy = dba.getYy();
+                		if(yy < 17){
+                			zcyNum++;
+                		}else if(yy >= 17 && yy <= 30){
+                			zyNum++;
+                		}else{
+                			gyNum++;
+                		}
+                	}
+                	Integer[] yyArr = {zcyNum,zyNum,gyNum};
+                	//冒泡降序排列
+                	for(int k = 0 ; k < yyArr.length - 1 ; k++){
+                		for(int j = 0 ; j < yyArr.length-k-1 ; j++){
+                			if(yyArr[j] < yyArr[j+1]){
+                				int temp = yyArr[j];
+                				yyArr[j] = yyArr[j+1];
+                				yyArr[j+1] = temp;
+                			}
+                		}
+                	}
+                	if(yyArr[0].equals(zcyNum)){
+                		yy_text = "常压("+zcyNum+")";
+                	}else if(yyArr[0].equals(zyNum)){
+                		yy_text = "中压("+zyNum+")";
+                	}else if(yyArr[0].equals(gyNum)){
+                		yy_text = "高压("+gyNum+")";
+                	}
+                	
+//                	if(zcyNum > zyNum && zcyNum > gyNum){
+//                		yy_text = "常压("+zcyNum+")";
+//                	}else if(zyNum > gyNum && zyNum > zcyNum){
+//                		yy_text = "中压("+zyNum+")";
+//                	}else if(gyNum > zyNum && gyNum > zcyNum){
+//                		yy_text = "高压("+gyNum+")";
+//                	}
+                	for(Iterator<Dba02> it = hgList.iterator() ; it.hasNext();){
+                		Dba02 dba = it.next();
+                		hgZsNum_total += dba.getRzsl();
+                	}
+                	System.out.println("第"+i+"条记录----队别："+db+"  井号："+jh + "  注水方式："+zsfs + "  合格天数：" + hgDays + " 合格总注水量："+hgZsNum_total + "  注水天数："+zsDays + "  总注水量："+zsNum_total + "  合格率："+hgl + "  结论："+jl + "  油压："+yy_text);
+                }
+            	System.out.println("分析层段合格率结束--"+CurrentTime.getCurrentTime());
+            }
+            
+    	}
+    	 return null;
+	}
+	
 }

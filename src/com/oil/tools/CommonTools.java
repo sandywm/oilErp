@@ -503,6 +503,32 @@ public class CommonTools {
 	
 	
 	public static void main(String[] args){
+		Integer[] yyArr = {1,5,5};
+		for(int k = 0 ; k < yyArr.length - 1 ; k++){
+    		for(int j = 0 ; j < yyArr.length-k-1 ; j++){
+    			if(yyArr[j] <  yyArr[j+1]){
+    				int temp = yyArr[j];
+    				yyArr[j] = yyArr[j+1];
+    				yyArr[j+1] = temp;
+    			}
+    		}
+    	}
+		for(int k = 0 ; k < yyArr.length ; k++){
+			System.out.println(yyArr[k]);
+		}
+		
+		String yy_text = "";
+		Integer zcyNum = 5;
+		Integer zyNum = 7;
+		Integer gyNum = 7;
+		if(zcyNum > zyNum && zcyNum > gyNum){
+    		yy_text = "常压("+zcyNum+")";
+    	}else if(zyNum > gyNum && zyNum > zcyNum){
+    		yy_text = "中压("+zyNum+")";
+    	}else if(gyNum > zyNum && gyNum > zcyNum){
+    		yy_text = "高压("+gyNum+")";
+    	}
+		System.out.println(yy_text);
 		Map<String, Integer> map_d = new HashMap<String, Integer>();
 		String bb = "1,2,3,4,1,1,1,1,3,1,2";
 		for(int i = 0 ; i < bb.split(",").length ; i++){

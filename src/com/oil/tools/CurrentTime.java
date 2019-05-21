@@ -1,6 +1,7 @@
 package com.oil.tools;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -583,30 +584,44 @@ public class CurrentTime {
     }
     
     /**
-     * 判断是否是合法的日期格式
+     * 判断是否是合法的yyyy-MM日期格式
      * @author wm
      * @date 2019-5-15 下午04:12:03
      * @param str
      * @return
      */
     public static boolean checkValidDate(String str){
-    	boolean flag = true;
-    	SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
-    	//设置lenient为false. 否则SimpleDateFormat会比较宽松地验证日期，比如2007-02-29会被接受，并转换成2007-03-01
-    	format.setLenient(false);
-    	try {
-			format.parse(str);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-			flag = false;
-		}
-    	return flag;
+    	DateFormat formatter = new SimpleDateFormat("yyyy-MM"); //这里的时间格式根据自己需求更改（注意：格式区分大小写、格式区分大小写、格式区分大小写） 
+		try{ 
+			//设置lenient为false. 否则SimpleDateFormat会比较宽松地验证日期，比如2007-02-29会被接受，并转换成2007-03-01
+			formatter.setLenient(false);
+			Date date = (Date)formatter.parse(str); 
+			return str.equals(formatter.format(date)); 
+		}catch(Exception e){ 
+			return false; 
+		} 
+    }
+    
+    /**
+     * 判断时候是合法的yyyy--MM-dd日期格式
+     * @param str
+     * @return
+     */
+    public static boolean checkValidDate_1(String str){
+    	DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); //这里的时间格式根据自己需求更改（注意：格式区分大小写、格式区分大小写、格式区分大小写） 
+		try{ 
+			//设置lenient为false. 否则SimpleDateFormat会比较宽松地验证日期，比如2007-02-29会被接受，并转换成2007-03-01
+			formatter.setLenient(false);
+			Date date = (Date)formatter.parse(str); 
+			return str.equals(formatter.format(date)); 
+		}catch(Exception e){ 
+			return false; 
+		} 
     }
     
 	public static void main(String args[]) throws Exception{
 //		System.out.println(CurrentTime.stringConvertToTimestamp("2019-03-01 00:00:00"));
 		
-		System.out.println(CurrentTime.checkValidDate("2019-3"));
+		System.out.println(CurrentTime.checkValidDate("2019-03"));
 	}
 }
