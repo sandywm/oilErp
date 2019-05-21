@@ -52,6 +52,7 @@ public class UserLoginFilter implements Filter{
 		Integer loginFlag_dataBase = -1;
 		if(userName.equals("") || userName.equals("null")){
 			if(!requesturi.endsWith("/login.do") 
+					&& !requesturi.endsWith("/common.do")
 					&& !requesturi.endsWith("/authImg")
 					&& !requesturi.endsWith("jsp")
 					&& !requesturi.endsWith("css") 

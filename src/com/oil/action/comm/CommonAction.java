@@ -871,7 +871,7 @@ public class CommonAction extends DispatchAction {
     	InputStream inputStream = new FileInputStream(f);
     	XSSFWorkbook xssfWorkbook = new XSSFWorkbook(inputStream);
     	Integer sheetNum = xssfWorkbook.getNumberOfSheets();
-    	if(sheetNum.equals(1)){
+    	if(sheetNum >= 1){
     		XSSFSheet sheet = xssfWorkbook.getSheetAt(0);
         	XSSFCellStyle style = xssfWorkbook.createCellStyle();  
             style.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式  
@@ -926,6 +926,56 @@ public class CommonAction extends DispatchAction {
             XSSFRow row0 = sheet.getRow(0);
             String jh0 = row0.getCell(0).getStringCellValue().replace(" ", "").replace("\t", "");//井号
             if(jh0.equals("井号")){
+            	XSSFCell cell0 = row0.createCell(1);//对别
+    			style.setFont(font_1);
+    			cell0.setCellStyle(style);
+    			cell0.setCellValue("对别");
+    			
+    			cell0 = row0.createCell(2);//注水方式
+    			style.setFont(font_1);
+    			cell0.setCellStyle(style);
+    			cell0.setCellValue("注水方式");
+            	
+    			cell0 = row0.createCell(3);//合格天数
+    			style.setFont(font_1);
+    			cell0.setCellStyle(style);
+    			cell0.setCellValue("合格天数");
+    			
+    			cell0 = row0.createCell(4);//合格总注水量
+    			style.setFont(font_1);
+    			cell0.setCellStyle(style);
+    			cell0.setCellValue("合格总注水量");
+    			
+    			cell0 = row0.createCell(5);//注水天数
+    			style.setFont(font_1);
+    			cell0.setCellStyle(style);
+    			cell0.setCellValue("注水天数");
+    			
+    			cell0 = row0.createCell(6);//总注水量
+    			style.setFont(font_1);
+    			cell0.setCellStyle(style);
+    			cell0.setCellValue("总注水量");
+    			
+    			cell0 = row0.createCell(7);//合格率
+    			style.setFont(font_1);
+    			cell0.setCellStyle(style);
+    			cell0.setCellValue("合格率");
+    			
+    			cell0 = row0.createCell(8);//结论
+    			style.setFont(font_1);
+    			cell0.setCellStyle(style);
+    			cell0.setCellValue("结论");
+    			
+    			cell0 = row0.createCell(9);//油压
+    			style.setFont(font_1);
+    			cell0.setCellStyle(style);
+    			cell0.setCellValue("油压");
+    			
+    			cell0 = row0.createCell(10);//原因分析
+    			style.setFont(font_1);
+    			cell0.setCellStyle(style);
+    			cell0.setCellValue("原因分析");
+    			
             	for (int i = 1; i < sheet.getLastRowNum()+1; i++) {
                 	XSSFRow row1 = sheet.getRow(i);
                 	String jh = row1.getCell(0).getStringCellValue().replace(" ", "").replace("\t", "");//井号
@@ -941,7 +991,7 @@ public class CommonAction extends DispatchAction {
                 	Integer zsDays = zsList.size();//注水天数1
                 	Integer zsNum_total = 0;//总注水量1
                 	String jl = "";//结论
-                	String yy_text = "";//油压 < 17-常压,17-30中压,>31高压
+                	String yy_text = "";//油压 < 17-常压,17-29中压,>=30高压
                 	if(zsList.size() > 0){
                 		Dba02 dba = zsList.get(0);
                 		db = dba.getDb();
@@ -959,16 +1009,25 @@ public class CommonAction extends DispatchAction {
                 	Integer zcyNum = 0;
                 	Integer zyNum = 0;
                 	Integer gyNum = 0;
+                	Integer opt1Num = 0;//泵压低出现次数
                 	for(Iterator<Dba02> it = zsList.iterator() ; it.hasNext();){
                 		Dba02 dba = it.next();
                 		zsNum_total += dba.getRzsl();
                 		Double yy = dba.getYy();
                 		if(yy < 17){
                 			zcyNum++;
-                		}else if(yy >= 17 && yy <= 30){
+                		}else if(yy >= 17 && yy < 30){
                 			zyNum++;
                 		}else{
                 			gyNum++;
+                		}
+                		if(jl.equals("不合格")){
+                			//分析备注原因
+                			String bz = dba.getBz();
+                			String opt1 = "泵压低";
+                			if(bz.contains(opt1)){
+                				opt1Num++;
+                			}
                 		}
                 	}
                 	Integer[] yyArr = {zcyNum,zyNum,gyNum};
@@ -1001,11 +1060,64 @@ public class CommonAction extends DispatchAction {
                 		Dba02 dba = it.next();
                 		hgZsNum_total += dba.getRzsl();
                 	}
+                	
+                	XSSFCell cell = row1.createCell(1);//对别
+        			style.setFont(font_1);
+        			cell.setCellStyle(style);
+        			cell.setCellValue(db);
+        			
+        			cell = row1.createCell(2);//注水方式
+        			style.setFont(font_1);
+        			cell.setCellStyle(style);
+        			cell.setCellValue(zsfs);
+                	
+        			cell = row1.createCell(3);//合格天数
+        			style.setFont(font_1);
+        			cell.setCellStyle(style);
+        			cell.setCellValue(hgDays);
+        			
+        			cell = row1.createCell(4);//合格总注水量
+        			style.setFont(font_1);
+        			cell.setCellStyle(style);
+        			cell.setCellValue(hgZsNum_total);
+        			
+        			cell = row1.createCell(5);//注水天数
+        			style.setFont(font_1);
+        			cell.setCellStyle(style);
+        			cell.setCellValue(zsDays);
+        			
+        			cell = row1.createCell(6);//总注水量
+        			style.setFont(font_1);
+        			cell.setCellStyle(style);
+        			cell.setCellValue(zsNum_total);
+        			
+        			cell = row1.createCell(7);//合格率
+        			style.setFont(font_1);
+        			cell.setCellStyle(style);
+        			cell.setCellValue(hgl);
+        			
+        			cell = row1.createCell(8);//结论
+        			if(jl.equals("合格")){
+        				style_pass.setFont(font_pass);
+        				cell.setCellStyle(style_pass);
+        			}else{
+        				style_no_pass.setFont(font_no_pass);
+        				cell.setCellStyle(style_no_pass);
+        			}
+        			cell.setCellValue(jl);
+        			
+        			cell = row1.createCell(9);//油压
+        			style.setFont(font_1);
+        			cell.setCellStyle(style);
+        			cell.setCellValue(yy_text);
+        			
+        			
                 	System.out.println("第"+i+"条记录----队别："+db+"  井号："+jh + "  注水方式："+zsfs + "  合格天数：" + hgDays + " 合格总注水量："+hgZsNum_total + "  注水天数："+zsDays + "  总注水量："+zsNum_total + "  合格率："+hgl + "  结论："+jl + "  油压："+yy_text);
                 }
-            	System.out.println("分析层段合格率结束--"+CurrentTime.getCurrentTime());
+            	FileOutputStream fout = new FileOutputStream(absoFilePath);//存到服务器
+            	xssfWorkbook.write(fout);  
+                fout.close();
             }
-            
     	}
     	 return null;
 	}
