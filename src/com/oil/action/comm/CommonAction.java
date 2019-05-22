@@ -862,9 +862,9 @@ public class CommonAction extends DispatchAction {
 		System.out.println("分析层段合格率开始--"+CurrentTime.getCurrentTime());
 		Map<String,String> map_final = new HashMap<String,String>();
 		Dba02Manager dm = (Dba02Manager) AppFactory.instance(null).getApp(Constants.WEB_DBA_02_INFO);
-		String excelName = Transcode.unescape_new1("excelName", request);//2019-04_sj.xlsx
+		String excelName = Transcode.unescape_new1("excelName", request);//指定期限2019-03-01~2019-03-31_层段合格率.xlsx
 		String absoFilePath = WebUrl.DATA_URL_UP_FILE_UPLOAD + "/" + excelName;
-		String specDateRange = excelName.substring(0, excelName.indexOf("_"));//指定期限2019-03-01~2019-03-31_层段合格率.xlsx
+		String specDateRange = excelName.substring(0, excelName.indexOf("_"));//指定期限2019-03-01~2019-03-31
 		String sDate = specDateRange.split("~")[0];
 		String eDate = specDateRange.split("~")[1];
 		File f = new File(absoFilePath);
@@ -925,16 +925,12 @@ public class CommonAction extends DispatchAction {
             
             XSSFRow row0 = sheet.getRow(0);
             String jh0 = row0.getCell(0).getStringCellValue().replace(" ", "").replace("\t", "");//井号
-            if(jh0.equals("井号")){
-            	XSSFCell cell0 = row0.createCell(1);//对别
+            String zsfs0 = row0.getCell(1).getStringCellValue().replace(" ", "").replace("\t", "");//注水方式
+            if(jh0.equals("井号") && zsfs0.equals("注水方式")){
+            	XSSFCell cell0 = row0.createCell(2);//对别
     			style.setFont(font_1);
     			cell0.setCellStyle(style);
     			cell0.setCellValue("对别");
-    			
-    			cell0 = row0.createCell(2);//注水方式
-    			style.setFont(font_1);
-    			cell0.setCellStyle(style);
-    			cell0.setCellValue("注水方式");
             	
     			cell0 = row0.createCell(3);//合格天数
     			style.setFont(font_1);
@@ -982,10 +978,10 @@ public class CommonAction extends DispatchAction {
                 	if(jh.equals("")){
                 		 break; 
                 	}
-                	List<Dba02> hgList = dm.listSjInfo(jh, sDate, eDate, true);//合格列表
-                	List<Dba02> zsList = dm.listValideZsInfoByOpt(jh, sDate, eDate);//注水记录列表--生产时间大于0即可
+                	String zsfs = row1.getCell(1).getStringCellValue().replace(" ", "").replace("\t", "");//注水方式
+                	List<Dba02> hgList = dm.listSjInfoByOpt(jh, zsfs,sDate, eDate);//合格列表
+                	List<Dba02> zsList = dm.listValideZsInfoByOpt(jh, zsfs,sDate, eDate);//注水记录列表--生产时间大于0即可
                 	String db = "";//队别1
-                	String zsfs = "";//注水方式1
                 	Integer hgDays = hgList.size();//合格天数1
                 	Integer hgZsNum_total = 0;//合格总注水量
                 	Integer zsDays = zsList.size();//注水天数1
@@ -995,7 +991,6 @@ public class CommonAction extends DispatchAction {
                 	if(zsList.size() > 0){
                 		Dba02 dba = zsList.get(0);
                 		db = dba.getDb();
-                		zsfs = dba.getZsfs();
                 	}
                 	Double hgl =0.0;//合格率
                 	if(zsDays > 0){
@@ -1061,15 +1056,10 @@ public class CommonAction extends DispatchAction {
                 		hgZsNum_total += dba.getRzsl();
                 	}
                 	
-                	XSSFCell cell = row1.createCell(1);//对别
+                	XSSFCell cell = row1.createCell(2);//对别
         			style.setFont(font_1);
         			cell.setCellStyle(style);
         			cell.setCellValue(db);
-        			
-        			cell = row1.createCell(2);//注水方式
-        			style.setFont(font_1);
-        			cell.setCellStyle(style);
-        			cell.setCellValue(zsfs);
                 	
         			cell = row1.createCell(3);//合格天数
         			style.setFont(font_1);
@@ -1111,15 +1101,180 @@ public class CommonAction extends DispatchAction {
         			cell.setCellStyle(style);
         			cell.setCellValue(yy_text);
         			
-        			
-                	System.out.println("第"+i+"条记录----队别："+db+"  井号："+jh + "  注水方式："+zsfs + "  合格天数：" + hgDays + " 合格总注水量："+hgZsNum_total + "  注水天数："+zsDays + "  总注水量："+zsNum_total + "  合格率："+hgl + "  结论："+jl + "  油压："+yy_text);
+        			cell = row1.createCell(10);//原因分析
+        			style.setFont(font_1);
+        			cell.setCellStyle(style);
+        			if(opt1Num > 0){
+        				cell.setCellValue("泵压低");
+        			}else{
+        				cell.setCellValue("");
+        			}
                 }
             	FileOutputStream fout = new FileOutputStream(absoFilePath);//存到服务器
             	xssfWorkbook.write(fout);  
                 fout.close();
+                //向层段合格率json文件中写入记录
+                String s = null;
+        		String dataPath = WebUrl.DATA_URL_JSON + "/cdhgl.json";
+        		File file = new File(dataPath);
+        		InputStreamReader br = new InputStreamReader(new FileInputStream(file),"utf-8");//读取文件,同时指定编码
+        		StringBuffer sb = new StringBuffer();
+                char[] ch = new char[128];  //一次读取128个字符
+                int len = 0;
+                while((len = br.read(ch,0, ch.length)) != -1){
+                    sb.append(ch, 0, len);
+                }
+                s = sb.toString();
+                //新增加的记录
+                JSONObject appObject = new JSONObject();
+                appObject.put("fileName", excelName);
+                appObject.put("date", specDateRange);
+                appObject.put("fxDate", CurrentTime.getCurrentTime());
+                appObject.put("filePath", excelName);
+                appObject.put("uploadUser", this.getLoginUserName(request));
+                
+                String newStr = "";
+                if(s.equals("")){//新增加
+                	JSONArray appArray = new JSONArray();
+                	appArray.add(appObject);
+                	JSONObject jsonObj = new JSONObject();
+                	jsonObj.put("excelList", appArray);
+                	newStr = jsonObj.toJSONString();
+                }else{//追加
+                	JSONObject dataJson = JSON.parseObject(s); 
+                    JSONArray features = dataJson.getJSONArray("excelList");// 找到features json数组
+                    features.add(appObject);
+                    newStr = dataJson.toJSONString();
+                }
+            	File file_1 = new File(dataPath);
+            	Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file_1), "UTF-8"));
+            	out.write(newStr);
+            	out.flush();
+            	out.close();
+            	map_final.put("result", "success");
+            }else{
+            	map_final.put("result", "contentError");//文件内容格式错误
             }
     	}
-    	 return null;
+    	CommonTools.getJsonPkg(map_final, response);
+    	return null;
+	}
+	
+	/**
+	 * 获取层段合格率分析数据记录(下载用)
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getCdHglData(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// TODO Auto-generated method stub
+		String s = null;
+		String msg = "暂无记录";
+		Integer count = 0;
+		Map<String,Object> map = new HashMap<String,Object>();
+		File file = new File(WebUrl.DATA_URL_JSON + "/cdhgl.json");
+		InputStreamReader br = new InputStreamReader(new FileInputStream(file),"utf-8");//读取文件,同时指定编码
+		StringBuffer sb = new StringBuffer();
+        char[] ch = new char[128];  //一次读取128个字符
+        int len = 0;
+        while((len = br.read(ch,0, ch.length)) != -1){
+            sb.append(ch, 0, len);
+        }
+        s = sb.toString();
+        if(!s.equals("")){
+        	JSONObject dataJson = JSON.parseObject(s); 
+            JSONArray features = dataJson.getJSONArray("excelList");// 找到features json数组
+            List<Object> list_d = new ArrayList<Object>();
+            for(Integer i = 0 ; i < features.size() ; i++){
+            	JSONObject obj = features.getJSONObject(i);// 获取features数组的第i个json对象
+            	Map<String,String> map_d = new HashMap<String,String>();
+            	String uploadUser = String.valueOf(obj.getString("uploadUser"));//获取上传者
+            	if(!uploadUser.equals("null")){
+            		if(uploadUser.equals(this.getLoginUserName(request))){
+                		msg = "success";
+                		map_d.put("fileName", obj.getString("fileName"));
+                		map_d.put("date", obj.getString("date"));
+                		map_d.put("fxDate", obj.getString("fxDate"));
+                		map_d.put("filePath", obj.getString("filePath"));
+                		list_d.add(map_d);
+                		count++;
+                	}else{
+                		continue;
+                	}
+            	}else{
+            		continue;
+            	}
+            }
+            if(msg.equals("success")){
+            	map.put("data", list_d);
+            }
+        }
+        map.put("msg", msg);
+		map.put("count", count);
+		map.put("code", 0);
+        CommonTools.getJsonPkg(map, response);
+		return null;
+	}
+	
+	/**
+	 * 删除指定的层段分析记录
+	 * @author wm
+	 * @date 2019-5-16 下午10:44:41 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward delCdHglData(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// TODO Auto-generated method stub
+		String fileName = Transcode.unescape_new1("fileName", request);
+		String s = null;
+		File file = new File(WebUrl.DATA_URL_JSON + "/cdhgl.json");
+		InputStreamReader br = new InputStreamReader(new FileInputStream(file),"utf-8");//读取文件,同时指定编码
+		StringBuffer sb = new StringBuffer();
+        char[] ch = new char[128];  //一次读取128个字符
+        int len = 0;
+        while((len = br.read(ch,0, ch.length)) != -1){
+            sb.append(ch, 0, len);
+        }
+        String msg = "error";
+        s = sb.toString();
+        JSONObject dataJson = JSON.parseObject(s); 
+        JSONArray features = dataJson.getJSONArray("excelList");// 找到features json数组
+        Map<String,String> map = new HashMap<String,String>();
+        for(Integer i = 0 ; i < features.size() ; i++){
+        	JSONObject obj = features.getJSONObject(i);// 获取features数组的第i个json对象
+        	String fileName_json = String.valueOf(obj.getString("fileName"));//获取文件名称
+        	if(!fileName_json.equals("null")){
+        		if(fileName_json.equals(fileName)){
+        			//删除服务器上对应的数据文件
+            		FileOpration.deleteFile(WebUrl.DATA_URL_UP_FILE_UPLOAD + "/" + obj.getString("filePath"));
+            		obj.clear();
+            		msg = "success";
+            		break;
+            	}
+        	}
+        }
+        if(msg.equals("success")){
+        	String jsonStr = dataJson.toString();
+            Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+            out.write(jsonStr);
+        	out.flush();
+        	out.close();
+        }else{
+        	msg = "success";
+        }
+    	br.close();
+    	map.put("result", msg);
+        CommonTools.getJsonPkg(map, response);
+		return null;
 	}
 	
 }

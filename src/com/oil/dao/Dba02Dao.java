@@ -43,4 +43,32 @@ public interface Dba02Dao {
 	 */
 	List<Dba02> findValideZsInfoByOpt(Session sess,String jh,String sDate,String eDate);
 	
+	/**
+	 * 根据井号、注水方式、时间段获取合格的水井记录列表
+	 * @author  Administrator
+	 * @ModifiedBy  
+	 * @date  2019-5-22 下午09:21:29
+	 * @param sess
+	 * @param jh 井号
+	 * @param zsfs 注水方式
+	 * @param sDate 开始时间
+	 * @param eDate 结束时间
+	 * @return
+	 */
+	List<Dba02> findSjInfoByOpt(Session sess,String jh,String zsfs,String sDate,String eDate);
+	
+	/**
+	 * 根据井号、注水方式、时间段获取水井记录列表（scsj大于0）
+	 * @author  Administrator
+	 * @ModifiedBy  
+	 * @date  2019-5-22 下午09:24:31
+	 * @param sess
+	 * @param jh 井号
+	 * @param zsfs 注水方式
+	 * @param sDate 开始时间
+	 * @param eDate 结束时间
+	 * @return
+	 */
+	List<Dba02> findValideZsInfoByOpt(Session sess,String jh,String zsfs,String sDate,String eDate);
+	
 }

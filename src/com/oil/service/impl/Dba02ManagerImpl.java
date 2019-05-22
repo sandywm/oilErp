@@ -80,4 +80,38 @@ public class Dba02ManagerImpl implements Dba02Manager{
 		}
 	}
 
+	@Override
+	public List<Dba02> listSjInfoByOpt(String jh, String zsfs, String sDate,
+			String eDate) throws WEBException {
+		// TODO Auto-generated method stub
+		try {
+			Dba02Dao dba02Dao = (Dba02Dao) DaoFactory.instance(null).getDao(Constants.DAO_DBA_02_INFO);
+			Session sess = HibernateUtil.currentSession();
+			return dba02Dao.findSjInfoByOpt(sess, jh, zsfs, sDate, eDate);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new WEBException("根据井号、注水方式、时间段获取合格的水井记录列表时出现异常!");
+		} finally{
+			HibernateUtil.closeSession();
+		}
+	}
+
+	@Override
+	public List<Dba02> listValideZsInfoByOpt(String jh, String zsfs,
+			String sDate, String eDate) throws WEBException {
+		// TODO Auto-generated method stub
+		try {
+			Dba02Dao dba02Dao = (Dba02Dao) DaoFactory.instance(null).getDao(Constants.DAO_DBA_02_INFO);
+			Session sess = HibernateUtil.currentSession();
+			return dba02Dao.findValideZsInfoByOpt(sess, jh, zsfs, sDate, eDate);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new WEBException("根据井号、注水方式、时间段获取水井记录列表（scsj大于0）时出现异常!");
+		} finally{
+			HibernateUtil.closeSession();
+		}
+	}
+
 }

@@ -41,4 +41,32 @@ public interface Dba02Manager {
 	 * @return
 	 */
 	List<Dba02> listValideZsInfoByOpt(String jh,String sDate,String eDate) throws WEBException;
+	
+	/**
+	 * 根据井号、注水方式、时间段获取合格的水井记录列表
+	 * @author  Administrator
+	 * @ModifiedBy  
+	 * @date  2019-5-22 下午09:27:51
+	 * @param jh 井号
+	 * @param zsfs 注水方式
+	 * @param sDate 开始时间
+	 * @param eDate 结束时间
+	 * @return
+	 * @throws WEBException
+	 */
+	List<Dba02> listSjInfoByOpt(String jh,String zsfs,String sDate,String eDate) throws WEBException;
+	
+	/**
+	 * 根据井号、注水方式、时间段获取水井记录列表（scsj大于0）
+	 * @author  Administrator
+	 * @ModifiedBy  
+	 * @date  2019-5-22 下午09:28:41
+	 * @param jh 井号
+	 * @param zsfs 注水方式
+	 * @param sDate 开始时间
+	 * @param eDate 结束时间
+	 * @return
+	 * @throws WEBException
+	 */
+	List<Dba02> listValideZsInfoByOpt(String jh,String zsfs,String sDate,String eDate) throws WEBException;
 }
