@@ -640,6 +640,7 @@ public class CommonAction extends DispatchAction {
                 appObject.put("fxDate", CurrentTime.getCurrentTime());
                 appObject.put("year", month.split("-")[0]);
                 appObject.put("filePath", excelName);
+                appObject.put("uploadUser", this.getLoginUserName(request));
                 
                 String newStr = "";
                 if(s.equals("")){//新增加
@@ -978,7 +979,15 @@ public class CommonAction extends DispatchAction {
                 	if(jh.equals("")){
                 		 break; 
                 	}
-                	String zsfs = row1.getCell(1).getStringCellValue().replace(" ", "").replace("\t", "");//注水方式
+                	String zsfs = "";
+                	Integer cell1Type = row1.getCell(1).getCellType();
+                	if(cell1Type.equals(0)){//数值型
+                		Double zsfs_d = row1.getCell(1).getNumericCellValue();
+                    	zsfs = String.valueOf(zsfs_d.intValue());
+                	}else if(cell1Type.equals(1)){//字符串
+                		zsfs = row1.getCell(1).getStringCellValue().replace(" ", "").replace("\t", "");
+                	}
+//                	String zsfs = row1.getCell(1).getStringCellValue().replace(" ", "").replace("\t", "");//注水方式
                 	List<Dba02> hgList = dm.listSjInfoByOpt(jh, zsfs,sDate, eDate);//合格列表
                 	List<Dba02> zsList = dm.listValideZsInfoByOpt(jh, zsfs,sDate, eDate);//注水记录列表--生产时间大于0即可
                 	String db = "";//队别1
