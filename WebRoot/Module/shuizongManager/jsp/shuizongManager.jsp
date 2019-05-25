@@ -159,22 +159,17 @@
 				bindEvent : function(){
 					var _this = this;
 					$('.closeBtn').on('click',function(){
-						$('.indexLayer').hide();
-						$('.loadingWrap').hide();
-						$('.upTipsTxt').show();
-						$('.succBox').hide();
 						_this.loadHglResList();
+						_this.commonHide();
 					});
 					$('.closeBtn_cd').on('click',function(){
-						$('.indexLayer').hide();
-						$('.loadingWrap').hide();
-						$('.upTipsTxt').show();
-						$('.succBox').hide();
 						_this.loadCdResList();
+						_this.commonHide();
 					});
 					$('.downBtn').on('click',function(){
 						var filePath = $(this).attr('filePath');
 						common.downFiles(filePath,0);
+						_this.commonHide();
 					});
 					//注水信息查询
 					$('#queryBtn_list').on('click',function(){
@@ -219,6 +214,12 @@
 						_this.loadHglResList();
 					});
 				},
+				commonHide : function(){
+					$('.indexLayer').hide();
+					$('.loadingWrap').hide();
+					$('.upTipsTxt').show();
+					$('.succBox').hide();
+				},
 				//获取层段合格率list
 				loadCdResList : function(){
 					layer.load('1');
@@ -247,12 +248,11 @@
 							
 						]],
 						done : function(res, curr, count){
-							console.log(res)
 							layer.closeAll('loading');
 						}
 					});
 					
-					table.on('tool(hglTable)',function(obj){
+					table.on('tool(cdTable)',function(obj){
 						if(obj.event == 'download'){//下载合格率文件
 							var filePath = $(this).attr('filePath');
 							common.downFiles(filePath,0);
