@@ -23,6 +23,7 @@
 					<ul class="layui-tab-title">
 						<li class="layui-this">注水信息</li>
 						<li>注水合格率分析</li>
+						<li>层段合格率分析</li>
 					</ul>
   					<div class="layui-card-body layui-tab-content">
 						<!-- 注水信息 -->
@@ -82,6 +83,18 @@
 								<table id="hglTable" class="layui-table" lay-filter="hglTable"></table>
 							</div>
 						</div>
+						<!-- 层段合格率分析 -->
+						<div class="layui-tab-item">
+							<!-- 查询条件 -->
+							<div class="layui-form searchForm layui-clear">
+								<div class="addFileBox">
+									<a id="selFileBtn_cd" href="javascript:void(0)" class="layui-btn"><i class="layui-icon layui-icon-add-1"></i>添加文件</a>
+								</div>
+							</div>
+							<div id="cdList">
+								<table id="cdTable" class="layui-table" lay-filter="cdTable"></table>
+							</div>
+						</div>
   					</div>
 				</div>
 			</div>
@@ -98,7 +111,7 @@
 				<i class="layui-icon layui-icon-ok-circle readSucc"></i>
 				<p class="succTxt">读取成功!</p>
 				<p class="downTxt layui-clear">
-					<a class="closeBtn" href="javascript:void(0)">关闭</a>
+					<a class="closeBtn_cd" href="javascript:void(0)">关闭</a>
 					<a class="downBtn" filePath="" href="javascript:void(0)">下载</a>
 				</p>
 			</div>
@@ -120,9 +133,12 @@
 			
 			//tab点击事件的监听 点拨指导 重点 难点 关键点 易混点
 			element.on('tab(zhushuiTab)', function(data){
-				if(data.index == 1){
+				if(data.index == 1){//注水合格率分析
 					page.loadHglResList();
 					page.upLoadHglFile();
+				}else if(data.index == 2){//层段合格率分析
+					page.loadCdResList();//加载层段合格率list
+					page.upLoadCdFile();
 				}
 			});
 			
@@ -134,7 +150,11 @@
 				},
 				upLoadHglFile : function(){
 					var url = '/common.do?action=uploadFile';
-					globalUpload.uploadFiles(url,1,'impHglFile');
+					globalUpload.uploadFiles(url,1,'impHglFile','selFileBtn');
+				},
+				upLoadCdFile : function(){
+					var url = '/common.do?action=uploadFile&opt=cd';
+					globalUpload.uploadFiles(url,1,'impCdFile','selFileBtn_cd');
 				},
 				bindEvent : function(){
 					var _this = this;
@@ -144,6 +164,13 @@
 						$('.upTipsTxt').show();
 						$('.succBox').hide();
 						_this.loadHglResList();
+					});
+					$('.closeBtn_cd').on('click',function(){
+						$('.indexLayer').hide();
+						$('.loadingWrap').hide();
+						$('.upTipsTxt').show();
+						$('.succBox').hide();
+						_this.loadCdResList();
 					});
 					$('.downBtn').on('click',function(){
 						var filePath = $(this).attr('filePath');
@@ -192,8 +219,57 @@
 						_this.loadHglResList();
 					});
 				},
+				//获取层段合格率list
+				loadCdResList : function(){
+					layer.load('1');
+					table.render({
+						elem: '#cdTable',
+						height: 'full-180',
+						url :'/common.do?action=getCdHglData',
+						method : 'post',
+						page : true,
+						even : true,
+						limit : 40,
+						limits:[10,20,30,40,50],
+						cellMinWidth : 150,
+						text: {none : '暂无相关数据'},
+						cols : [[
+							{field : '', title: '序号', type:'numbers',fixed: 'left' , align:'center'},
+							{field : 'fileName', title: '文件名', align:'center' },
+							{field : 'date', title: '日期',align:'center'},
+							{field : 'fxDate', title: '分析日期',align:'center'},
+							{field : '', title: '操作',align:'center',templet:function(d){
+								var str = '';
+								str += '<a href="javascript:void(0)" class="layui-btn layui-btn-xs" lay-event="download" filePath="'+ d.filePath +'"><i class="layui-icon layui-icon-download-circle"></i>下载</a>';
+								str += '<a href="javascript:void(0)" class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete" fileName="'+ d.fileName +'"><i class="layui-icon layui-icon-delete"></i>删除</a>';
+								return str;
+							}}
+							
+						]],
+						done : function(res, curr, count){
+							console.log(res)
+							layer.closeAll('loading');
+						}
+					});
+					
+					table.on('tool(hglTable)',function(obj){
+						if(obj.event == 'download'){//下载合格率文件
+							var filePath = $(this).attr('filePath');
+							common.downFiles(filePath,0);
+						}else if(obj.event == 'delete'){
+							var fileName = $(this).attr('fileName');
+							layer.confirm('确定要删除文件[<span style="color:#F47837">' + fileName + '</span>]?',{
+								title:'删除文件?',
+							  	skin: 'layui-layer-molv',
+							  	btn: ['确定','取消'] //按钮
+							},function(){//层段删除
+								_this.delFileFun(fileName,'common.do?action=delCdHglData','cd');
+							});
+						}
+					});
+				},
 				loadHglResList : function(){
-					var yearInpVal = $('#yearInp').val();
+					var yearInpVal = $('#yearInp').val(),_this = this;
 					layer.load('1');
 					var field = {specYear:yearInpVal};
 					layer.load('1');
@@ -236,25 +312,33 @@
 								title:'删除文件?',
 							  	skin: 'layui-layer-molv',
 							  	btn: ['确定','取消'] //按钮
-							},function(){
-								layer.load('1');
-								$.ajax({
-			    					type:'post',
-			    			        dataType:'json',
-			    			        data : {fileName : fileName},
-			    			        url:'/common.do?action=delHglData',
-			    			        success:function (json){
-			    			        	layer.closeAll('loading');	
-			    			        	if(json['result'] == 'success'){
-			    			        		layer.msg('删除成功',{icon:1,time:1500},function(){
-			    			        			page.loadHglResList();
-			    			        		});
-			    			        	}
-			    			        }
-			    				});
+							},function(){//注水合格率删除
+								_this.delFileFun(fileName,'common.do?action=delHglData','hgl');
 							});
 						}
 					});
+				},
+				delFileFun : function(fileName,url,opt){
+					layer.load('1');
+					var _this = this;
+					$.ajax({
+    					type:'post',
+    			        dataType:'json',
+    			        data : {fileName : fileName},
+    			        url:url,
+    			        success:function (json){
+    			        	layer.closeAll('loading');	
+    			        	if(json['result'] == 'success'){
+    			        		layer.msg('删除成功',{icon:1,time:1500},function(){
+    			        			if(opt == 'hgl'){
+    			        				_this.loadHglResList();
+    			        			}else if(opt == 'cd'){
+    			        				_this.loadCdResList();
+    			        			}
+    			        		});
+    			        	}
+    			        }
+    				});
 				},
 				//加载注水信息list
 				loadZhuShuiList : function(){

@@ -14,12 +14,12 @@ layui.define(['element','jquery','upload','form'],function(exports){
     		readingTips : '<div class="spinner"></div><p>正在读取中<span class="dotting"></span></p><p>请勿刷新页面</p>',
     		readSuccTips : '<i class="layui-icon layui-icon-ok-circle readSucc"></i><p class="succTxt">读取成功!</p><p class="downTxt layui-clear"><a class="closeBtn" href="javascript:void(0)" onclick="closeLayer()">关闭</a><a class="downBtn" href="javascript:void(0)">下载</a></p>'
 		},
-		uploadFiles : function(url,maxNumber,opts){
+		uploadFiles : function(url,maxNumber,opts,elem){
 			this.data.globalOpts = opts;
 			var _this = this
 			 //,alreadyUploadFiles={}//记录已经上传成功的文件相对路径（后台返回）
 			,uploadListIns=upload.render({
-				  elem : '#selFileBtn'
+				  elem : '#' + elem
 				  ,url: url//这里设置自己的上传接口
 				  ,accept: 'file'
 				  ,exts : 'xlsx'
@@ -58,7 +58,7 @@ layui.define(['element','jquery','upload','form'],function(exports){
 			    			}
 			    		}else{
 			    			//如果是其他文件类类型，单个文件不能大于10M
-			    			if(opts == 'impHglFile'){//注水合格率分析
+			    			if(opts == 'impHglFile' || opts == 'impCdFile'){//注水合格率分析
 			    				if(size > (20 * 1024 * 1024)){
 				    				layer.msg('上传的文件不能大于20M',{icon:5,anim:6,time:2000});
 				    				return;
@@ -76,7 +76,7 @@ layui.define(['element','jquery','upload','form'],function(exports){
 				  ,done: function(res, index, upload){
 					layer.closeAll('loading');
 				    if(res.msg == 'success'){ //上传成功
-				    	if(opts == 'impHglFile'){
+				    	if(opts == 'impHglFile' || opts == 'impCdFile'){
 				    		//执行读取通知书 调出遮罩层	
 				    		succFileName = res.fileName;
 				    		$('.indexLayer').show();
@@ -108,6 +108,8 @@ layui.define(['element','jquery','upload','form'],function(exports){
 					$('.spinnerBox').show();
 					if(opts == 'impHglFile'){//读取通知书
 						tmpUrl = '/common.do?action=dealZsExcel';
+					}else if(opts == 'impCdFile'){
+						tmpUrl = '/common.do?action=dealCdHglExcel';
 					}
 					_this.readImportFile(tmpUrl,succFileName);
 				}
