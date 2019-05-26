@@ -15,10 +15,9 @@ layui.define(['element','jquery','upload','form'],function(exports){
     		readSuccTips : '<i class="layui-icon layui-icon-ok-circle readSucc"></i><p class="succTxt">读取成功!</p><p class="downTxt layui-clear"><a class="closeBtn" href="javascript:void(0)" onclick="closeLayer()">关闭</a><a class="downBtn" href="javascript:void(0)">下载</a></p>'
 		},
 		uploadFiles : function(url,maxNumber,opts,elem){
-			this.data.globalOpts = opts;
-			var _this = this
+			var _this = this;
 			 //,alreadyUploadFiles={}//记录已经上传成功的文件相对路径（后台返回）
-			,uploadListIns=upload.render({
+			upload.render({
 				  elem : '#' + elem
 				  ,url: url//这里设置自己的上传接口
 				  ,accept: 'file'

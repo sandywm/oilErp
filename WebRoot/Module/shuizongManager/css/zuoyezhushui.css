@@ -1,3 +1,28 @@
+.layui-fluid{
+	padding:0 10px !important;
+}
+.layui-table-cell{
+	height:24px;
+	line-height:24px;
+}
+.hglForm,
+.cdForm{
+	display:none;
+}
+.layui-tab-title{
+	height:50px;
+}
+.layui-tab-title li{
+	line-height:50px !important;
+}
+.layui-tab-title .layui-this:after{
+	height:51px !important;
+}
+.searchForm{
+	position:absolute;
+	right:10px;
+	top:6px;
+}
 .itemDivs{
 	float: left;
 	margin-right: 10px;

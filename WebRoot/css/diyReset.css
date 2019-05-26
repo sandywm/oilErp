@@ -22,7 +22,8 @@
 }
 .content-body .layui-tab-content{
 	position: absolute;
-    top: 42px;
+    /*top: 42px;*/
+    top:0px;
     bottom: 0;
     width: 100%;
     padding: 0;

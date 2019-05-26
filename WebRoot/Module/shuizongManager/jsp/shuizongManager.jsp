@@ -16,42 +16,66 @@
 	
   </head>
   <body style="background:#f2f2f2;">
-  	 <div class="layui-fluid" style="margin-top:15px;">
+  	 <div class="layui-fluid" style="margin-top:0px;">
 		<div class="layui-row">
 			<div class="layui-col-md12 layui-col-lg12">
 				<div class="layui-card layui-tab layui-tab-brief" lay-filter="zhushuiTab" style="margin:0;">
 					<ul class="layui-tab-title">
-						<li class="layui-this">注水信息</li>
-						<li>注水合格率分析</li>
-						<li>层段合格率分析</li>
+						<li class="layui-this" isClick="false">注水信息</li>
+						<li isClick="false">注水合格率分析</li>
+						<li isClick="false">层段合格率分析</li>
 					</ul>
+					<!-- 注水信息查询条件 -->
+					<div class="layui-form searchForm infoForm layui-clear">
+						<div class="itemDivs" style="width:150px;">
+							<div class="layui-input-inline">
+								<span class="symbol">井</span>
+								<input type="text" style="width:78%;" placeholder="请输入注水井号" maxlength="20" class="layui-input inpJhNum"/> 
+							</div>
+						</div>
+						<div class="itemDivs dateBox">
+							<div class="layui-input-inline" style="width:120px;">
+								<input type="text" id="stDate" class="layui-input" readonly placeholder="请选择起始时间" />
+							</div>
+							<span>至</span>
+							<div class="layui-input-inline" style="width:120px;">
+								<input type="text" id="edDate" class="layui-input" readonly placeholder="请选择结束时间" />
+							</div>
+						</div>
+						<div class="itemDivs">
+							<div class="layui-input-inline">
+								<button id="queryBtn_list" class="layui-btn"><i class="layui-icon layui-icon-search"></i></button>
+							</div>
+						</div>
+						<a class="resetBtn resetList" href="javascript:void(0)">重置<i class="layui-icon layui-icon-refresh"></i></a>
+					</div>
+					<!-- 合格率查询条件 -->
+					<div class="layui-form searchForm hglForm layui-clear">
+						<div class="itemDivs">
+							<div class="layui-input-inline" style="width:75px;">
+								<input type="text" id="yearInp" placeholder="选择年份" readonly class="layui-input"/> 
+								<strong class="yearTxt">年</strong>
+							</div>
+						</div>
+						<div class="itemDivs">
+							<div class="layui-input-inline">
+								<button id="queryBtn_hgl" class="layui-btn"><i class="layui-icon layui-icon-search"></i></button>
+							</div>
+						</div>
+						<div class="addFileBox">
+							<a id="selFileBtn" opts="addHgl" href="javascript:void(0)" class="layui-btn layui-btn-normal"><i class="layui-icon layui-icon-add-1"></i>添加文件</a>
+						</div>
+					</div>
+					<!-- 查询条件 -->
+					<div class="layui-form searchForm cdForm layui-clear">
+						<div class="addFileBox">
+							<a id="selFileBtn_cd" opts="addCd" href="javascript:void(0)" class="layui-btn layui-btn-normal"><i class="layui-icon layui-icon-add-1"></i>添加文件</a>
+						</div>
+					</div>
+					
   					<div class="layui-card-body layui-tab-content">
 						<!-- 注水信息 -->
   						<div class="layui-tab-item layui-show">
-							<!-- 查询条件 -->
-							<div class="layui-form searchForm layui-clear">
-								<div class="itemDivs">
-									<div class="layui-input-inline">
-										<span class="symbol">井</span>
-										<input type="text" placeholder="请输入注水井号" maxlength="20" class="layui-input inpJhNum"/> 
-									</div>
-								</div>
-								<div class="itemDivs dateBox">
-									<div class="layui-input-inline">
-										<input type="text" id="stDate" class="layui-input" readonly placeholder="请输入起始时间" />
-									</div>
-									<span>至</span>
-									<div class="layui-input-inline">
-										<input type="text" id="edDate" class="layui-input" readonly placeholder="请输入结束时间" />
-									</div>
-								</div>
-								<div class="itemDivs">
-									<div class="layui-input-inline">
-										<button id="queryBtn_list" class="layui-btn"><i class="layui-icon layui-icon-search"></i></button>
-									</div>
-								</div>
-								<a class="resetBtn resetList" href="javascript:void(0)">重置<i class="layui-icon layui-icon-refresh"></i></a>
-							</div>
 							<div id="zhushuiList">
 								<p class="tipsTxt">请根据条件查看具体井号的注水信息！</p>
 								<div class="listZhushui">
@@ -62,35 +86,13 @@
 						</div>
 						<!-- 注水合格率分析 -->
 						<div class="layui-tab-item">
-							<!-- 查询条件 -->
-							<div class="layui-form searchForm layui-clear">
-								<div class="itemDivs">
-									<div class="layui-input-inline" style="width:75px;">
-										<input type="text" id="yearInp" placeholder="选择年份" readonly class="layui-input"/> 
-										<strong class="yearTxt">年</strong>
-									</div>
-								</div>
-								<div class="itemDivs">
-									<div class="layui-input-inline">
-										<button id="queryBtn_hgl" class="layui-btn"><i class="layui-icon layui-icon-search"></i></button>
-									</div>
-								</div>
-								<div class="addFileBox">
-									<a id="selFileBtn" href="javascript:void(0)" class="layui-btn"><i class="layui-icon layui-icon-add-1"></i>添加文件</a>
-								</div>
-							</div>
 							<div id="hglList">
 								<table id="hglTable" class="layui-table" lay-filter="hglTable"></table>
 							</div>
 						</div>
 						<!-- 层段合格率分析 -->
 						<div class="layui-tab-item">
-							<!-- 查询条件 -->
-							<div class="layui-form searchForm layui-clear">
-								<div class="addFileBox">
-									<a id="selFileBtn_cd" href="javascript:void(0)" class="layui-btn"><i class="layui-icon layui-icon-add-1"></i>添加文件</a>
-								</div>
-							</div>
+							
 							<div id="cdList">
 								<table id="cdTable" class="layui-table" lay-filter="cdTable"></table>
 							</div>
@@ -111,8 +113,8 @@
 				<i class="layui-icon layui-icon-ok-circle readSucc"></i>
 				<p class="succTxt">读取成功!</p>
 				<p class="downTxt layui-clear">
-					<a class="closeBtn_cd" href="javascript:void(0)">关闭</a>
-					<a class="downBtn" filePath="" href="javascript:void(0)">下载</a>
+					<a class="closeBtn" opts="" href="javascript:void(0)">关闭</a>
+					<a class="downBtn" opts="" filePath="" href="javascript:void(0)">下载</a>
 				</p>
 			</div>
 			
@@ -133,12 +135,33 @@
 			
 			//tab点击事件的监听 点拨指导 重点 难点 关键点 易混点
 			element.on('tab(zhushuiTab)', function(data){
-				if(data.index == 1){//注水合格率分析
+				var isClick = $(this).attr('isClick');
+				if(data.index == 0){
+					$('.infoForm').show();
+					$('.hglForm').hide();
+					$('.cdForm').hide();
+				}else if(data.index == 1){//注水合格率分析
+					$('.infoForm').hide();
+					$('.hglForm').show();
+					$('.cdForm').hide();
 					page.loadHglResList();
-					page.upLoadHglFile();
+					if(isClick == 'false'){
+						page.upLoadHglFile();
+					}
+					$(this).attr('isClick','true');
+					$('.closeBtn').attr('opts','closeHgl');
+					$('.downBtn').attr('opts','downHgl');
 				}else if(data.index == 2){//层段合格率分析
+					$('.infoForm').hide();
+					$('.hglForm').hide();
+					$('.cdForm').show();
+					$('.closeBtn').attr('opts','closeCd');
+					$('.downBtn').attr('opts','downCd');
 					page.loadCdResList();//加载层段合格率list
-					page.upLoadCdFile();
+					if(isClick == 'false'){
+						page.upLoadCdFile();
+					}
+					$(this).attr('isClick','true');
 				}
 			});
 			
@@ -159,15 +182,22 @@
 				bindEvent : function(){
 					var _this = this;
 					$('.closeBtn').on('click',function(){
-						_this.loadHglResList();
-						_this.commonHide();
-					});
-					$('.closeBtn_cd').on('click',function(){
-						_this.loadCdResList();
+						var opts = $(this).attr('opts');
+						if(opts == 'closeHgl'){
+							_this.loadHglResList();
+						}else{
+							_this.loadCdResList();
+						}
 						_this.commonHide();
 					});
 					$('.downBtn').on('click',function(){
-						var filePath = $(this).attr('filePath');
+						var filePath = $(this).attr('filePath'),
+							opts = $(this).attr('opts');
+						if(opts == 'downHgl'){
+							_this.loadHglResList();
+						}else{
+							_this.loadCdResList();
+						}
 						common.downFiles(filePath,0);
 						_this.commonHide();
 					});
@@ -225,7 +255,7 @@
 					layer.load('1');
 					table.render({
 						elem: '#cdTable',
-						height: 'full-180',
+						height: 'full-100',
 						url :'/common.do?action=getCdHglData',
 						method : 'post',
 						page : true,
@@ -263,7 +293,7 @@
 							  	skin: 'layui-layer-molv',
 							  	btn: ['确定','取消'] //按钮
 							},function(){//层段删除
-								_this.delFileFun(fileName,'common.do?action=delCdHglData','cd');
+								page.delFileFun(fileName,'common.do?action=delCdHglData','cd');
 							});
 						}
 					});
@@ -275,7 +305,7 @@
 					layer.load('1');
 					table.render({
 						elem: '#hglTable',
-						height: 'full-180',
+						height: 'full-100',
 						url :'/common.do?action=getHglData',
 						method : 'post',
 						where:field,
@@ -313,7 +343,7 @@
 							  	skin: 'layui-layer-molv',
 							  	btn: ['确定','取消'] //按钮
 							},function(){//注水合格率删除
-								_this.delFileFun(fileName,'common.do?action=delHglData','hgl');
+								page.delFileFun(fileName,'common.do?action=delHglData','hgl');
 							});
 						}
 					});
@@ -349,7 +379,7 @@
 					var field = {jh:jhVal,sDate:sDateVal,eDate:edDateVal};
 		    		table.render({
 						elem: '#listTable',
-						height: 'full-200',
+						height: 'full-120',
 						url :'/common.do?action=getPageSjHglData',
 						method : 'post',
 						where:field,
@@ -360,7 +390,7 @@
 						cellMinWidth : 150,
 						text: {none : '暂无相关数据'},
 						cols : [[
-							{field : '', title: '序号', type:'numbers',fixed: 'left' , align:'center'},
+							{field : '', title: '序号', type:'numbers', align:'center'},
 							{field : 'jh', title: '井号', align:'center' },
 							{field : 'db', title: '队别',align:'center',templet:function(d){
 								return d.db + '队';

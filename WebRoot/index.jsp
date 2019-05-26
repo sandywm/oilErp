@@ -66,6 +66,7 @@
   				<!-- 左侧导航区域（可配合layui已有的垂直导航） -->
   				<ul id="leftSideNav" class="layui-nav layui-nav-tree" lay-fliter="leftSideNav">
   					<li class="layui-nav-item navLi layui-this"><a href="javascript:void(0)" path="common.do?action=goZsPage" tab-id="1">作业注水合格率</a></li>
+  					<li class="layui-nav-item navLi"><a href="javascript:void(0)" path="common.do?action=goZsPage" tab-id="2">作业注水合格率1</a></li>
   					<!--  li class="layui-nav-item navLi"><a href="javascript:void(0)" path="youzongtiaopei.html" tab-id="2">油综调配见效率</a></li>
   					<li class="layui-nav-item navLi"><a href="javascript:void(0)" path="shuizongtiaopei.html" tab-id="3">水综调配方案</a></li>
   					<li class="layui-nav-item navLi"><a href="javascript:void(0)" path="shuizongcengduan.html" tab-id="4">水综层段合格率</a></li-->
