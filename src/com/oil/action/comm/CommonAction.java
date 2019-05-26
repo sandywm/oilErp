@@ -478,7 +478,7 @@ public class CommonAction extends DispatchAction {
 //                	}else{
 //                		
 //                	}
-                	System.out.println("井号--"+jh+"    "+sDate+"~"+eDate);
+//                	System.out.println("井号--"+jh+"    "+sDate+"~"+eDate);
                 	if(!sDate.equals("") && !eDate.equals("")){
                 		List<Dba02> dList_zsts = dm.listValideZsInfoByOpt(jh, sDate, eDate);
                 		List<Dba02> dList_hg = dm.listSjInfo(jh,sDate,eDate,true);
