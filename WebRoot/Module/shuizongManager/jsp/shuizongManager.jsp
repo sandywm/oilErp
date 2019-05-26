@@ -22,8 +22,8 @@
 				<div class="layui-card layui-tab layui-tab-brief" lay-filter="zhushuiTab" style="margin:0;">
 					<ul class="layui-tab-title">
 						<li class="layui-this" isClick="false">注水信息</li>
-						<li isClick="false">注水合格率分析</li>
-						<li isClick="false">层段合格率分析</li>
+						<li id="zsPartNav" isClick="false" class="hideItem" style="display:none;">注水合格率分析</li>
+						<li id="cdPartNav" isClick="false" class="hideItem" style="display:none;">层段合格率分析</li>
 					</ul>
 					<!-- 注水信息查询条件 -->
 					<div class="layui-form searchForm infoForm layui-clear">
@@ -85,14 +85,13 @@
 							</div>
 						</div>
 						<!-- 注水合格率分析 -->
-						<div class="layui-tab-item">
+						<div id="zsPart" class="layui-tab-item">
 							<div id="hglList">
 								<table id="hglTable" class="layui-table" lay-filter="hglTable"></table>
 							</div>
 						</div>
 						<!-- 层段合格率分析 -->
-						<div class="layui-tab-item">
-							
+						<div id="cdPart" class="layui-tab-item">
 							<div id="cdList">
 								<table id="cdTable" class="layui-table" lay-filter="cdTable"></table>
 							</div>
@@ -123,6 +122,13 @@
 	<script src="/plugins/jquery/jquery.min.js"></script>
     <script src="/plugins/layui/layui.js"></script>
     <script type="text/javascript">
+    	var moduleId = '${ sessionScope.moduleId }';
+    	if(moduleId.indexOf('zs') >= 0){
+    		$('#zsPartNav').show();
+    	}
+    	if(moduleId.indexOf('cd') >= 0){
+    		$('#cdPartNav').show();
+    	}
 	    layui.config({
 			base: '/plugins/frame/js/'
 		}).use(['element','laydate','table','layer','upLoadFiles','common'],function(){
@@ -387,7 +393,7 @@
 						even : true,
 						limit : 40,
 						limits:[10,20,30,40,50],
-						cellMinWidth : 150,
+						cellMinWidth : 80,
 						text: {none : '暂无相关数据'},
 						cols : [[
 							{field : '', title: '序号', type:'numbers', align:'center'},

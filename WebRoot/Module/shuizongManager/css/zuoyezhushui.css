@@ -1,9 +1,13 @@
 .layui-fluid{
 	padding:0 10px !important;
 }
+.layui-table tbody tr:hover{
+	background:#8cceff !important;
+	color:#fff !important;
+}
 .layui-table-cell{
-	height:24px;
-	line-height:24px;
+	height:18px;
+	line-height:18px;
 }
 .hglForm,
 .cdForm{
