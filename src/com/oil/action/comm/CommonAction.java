@@ -421,7 +421,9 @@ public class CommonAction extends DispatchAction {
             style_no_pass.setFont(font_no_pass);
             
             String specDate = excelName.substring(0, excelName.indexOf("_"));//指定年份月份作业井2019-03
-            Integer maxDays = CurrentTime.getMaxDays(specDate);//指定月份的天数
+            String specNewDate_s = CurrentTime.getSpecNewDate(specDate, -1) + "-26"; 
+            String specNewDate_e = specDate + "-25"; //每个月从上月26到当月25日
+//            Integer maxDays = CurrentTime.getMaxDays(specDate);//指定月份的天数
             Map<String,String> map_d = new HashMap<String,String>();
             Integer totalRow = sheet.getLastRowNum();
             boolean flag = false;
@@ -452,19 +454,31 @@ public class CommonAction extends DispatchAction {
                 	}
                 	String curr_unit = String.valueOf((int)row1.getCell(2).getNumericCellValue());//单位
                 	String kjrq = CurrentTime.dateConvertToString(row1.getCell(3).getDateCellValue());//开井日期
-                	Integer diffDays = CurrentTime.compareDate(kjrq, specDate+"-"+maxDays);
+//                	Integer diffDays = CurrentTime.compareDate(kjrq, specDate+"-"+maxDays);
                 	String sDate = "";
                 	String eDate = "";
-                	if(diffDays > maxDays){//相差天数超过一个月，用指定年份月份的月初和月末日期作为开始和结束日期
-                		String[] seDate = CurrentTime.getFirstEndDay(specDate).split(":");
-                		sDate = seDate[0];
-                		eDate = seDate[1];
-                	}else if(diffDays >= 0 && diffDays < maxDays){//用开井日期作为开始，月末日期作为结束
+                	Integer diffDays_s = CurrentTime.compareDate(kjrq, specNewDate_s);//和开始日期比较
+                	Integer diffDays_e = CurrentTime.compareDate(kjrq, specNewDate_e);//和结束日期比较
+                	if(diffDays_s >= 0){//按照diffDays_s至diffDays_e为准
+                		sDate = specNewDate_s;
+                		eDate = specNewDate_e;
+                	}else if(diffDays_s < 0 && diffDays_e >= 0){//按照kjrq至diffDays_e为准
                 		sDate = kjrq;
-                		eDate = specDate + "-" + maxDays;
-                	}else{
+                		eDate = specNewDate_e;
+                	}else{//开井日期超过当月25日，不计算
                 		
                 	}
+//                	if(diffDays > maxDays){//相差天数超过一个月，用指定年份月份的月初和月末日期作为开始和结束日期
+//                		String[] seDate = CurrentTime.getFirstEndDay(specDate).split(":");
+//                		sDate = seDate[0];
+//                		eDate = seDate[1];
+//                	}else if(diffDays >= 0 && diffDays < maxDays){//用开井日期作为开始，月末日期作为结束
+//                		sDate = kjrq;
+//                		eDate = specDate + "-" + maxDays;
+//                	}else{
+//                		
+//                	}
+                	System.out.println("井号--"+jh+"    "+sDate+"~"+eDate);
                 	if(!sDate.equals("") && !eDate.equals("")){
                 		List<Dba02> dList_zsts = dm.listValideZsInfoByOpt(jh, sDate, eDate);
                 		List<Dba02> dList_hg = dm.listSjInfo(jh,sDate,eDate,true);

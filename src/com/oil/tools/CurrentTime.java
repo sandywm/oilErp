@@ -556,6 +556,24 @@ public class CurrentTime {
     }
     
     /**
+     * 指定时间加减月数
+     * @author wm
+     * @date 2019-5-26 上午09:17:23
+     * @param specDate
+     * @param diffMonth
+     * @return
+     * @throws Exception 
+     */
+    public static String getSpecNewDate(String specDate,Integer diffMonth) throws Exception{
+    	SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM");
+		Calendar calendar = Calendar.getInstance();
+		Date now = format1.parse(specDate);
+		calendar.setTime(now);
+		calendar.add(Calendar.MONTH, diffMonth);
+    	return format1.format(calendar.getTime());
+    }
+    
+    /**
      * 获取随机数（分+秒+毫秒）
      * @description
      * @author Administrator
@@ -622,6 +640,6 @@ public class CurrentTime {
 	public static void main(String args[]) throws Exception{
 //		System.out.println(CurrentTime.stringConvertToTimestamp("2019-03-01 00:00:00"));
 		
-		System.out.println(CurrentTime.checkValidDate("2019-03"));
+		System.out.println(CurrentTime.getSpecNewDate("2019-01", -1));
 	}
 }
