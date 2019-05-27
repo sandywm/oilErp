@@ -503,6 +503,10 @@ public class CommonTools {
 	
 	
 	public static void main(String[] args){
+		
+		String aaa = "";
+		System.out.println(aaa.contains("aaa"));
+		
 		Integer[] yyArr = {1,5,5};
 		for(int k = 0 ; k < yyArr.length - 1 ; k++){
     		for(int j = 0 ; j < yyArr.length-k-1 ; j++){

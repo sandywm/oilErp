@@ -9,4 +9,6 @@ public class Constants {
 	
 	//-------------------DAO-------------------------//
 	public static final String DAO_DBA_02_INFO = "dba_02_info_Dao";
+	
+	public static final String DATA_BASE_INFO = "oracle";
 }

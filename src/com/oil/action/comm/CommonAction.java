@@ -997,7 +997,13 @@ public class CommonAction extends DispatchAction {
                 	Integer cell1Type = row1.getCell(1).getCellType();
                 	if(cell1Type.equals(0)){//数值型
                 		Double zsfs_d = row1.getCell(1).getNumericCellValue();
-                    	zsfs = String.valueOf(zsfs_d.intValue());
+                		if(zsfs_d < 10){
+                			zsfs = "00" + String.valueOf(zsfs_d.intValue());
+                		}else if(zsfs_d < 100){
+                			zsfs = "0" + String.valueOf(zsfs_d.intValue());
+                		}else{
+                			zsfs = String.valueOf(zsfs_d.intValue());
+                		}
                 	}else if(cell1Type.equals(1)){//字符串
                 		zsfs = row1.getCell(1).getStringCellValue().replace(" ", "").replace("\t", "");
                 	}
@@ -1019,7 +1025,7 @@ public class CommonAction extends DispatchAction {
                 	if(zsDays > 0){
                 		hgl = Convert.convertInputNumber_2(hgDays * 100.0 / zsDays);//合格率
                 	}
-                	if(hgl >= 90 && hgl <= 110){
+                	if(hgl >= 80){
                 		jl = "合格";
                 	}else{
                 		jl = "不合格";
@@ -1027,7 +1033,10 @@ public class CommonAction extends DispatchAction {
                 	Integer zcyNum = 0;
                 	Integer zyNum = 0;
                 	Integer gyNum = 0;
-                	Integer opt1Num = 0;//泵压低出现次数
+                	Integer bydNum = 0;//泵压低出现次数
+                	Integer zbjsNum = 0;//注不进水
+                	Integer tbNum = 0;//停泵
+                	Integer dlgzNum = 0;//电路故障
                 	for(Iterator<Dba02> it = zsList.iterator() ; it.hasNext();){
                 		Dba02 dba = it.next();
                 		zsNum_total += dba.getRzsl();
@@ -1042,11 +1051,44 @@ public class CommonAction extends DispatchAction {
                 		if(jl.equals("不合格")){
                 			//分析备注原因
                 			String bz = dba.getBz();
-                			String opt1 = "泵压低";
-                			if(bz.contains(opt1)){
-                				opt1Num++;
+                			if(bz != null){
+                				if(bz.contains("泵压低")){
+                    				bydNum++;
+                    			}
+                    			if(bz.contains("注不进水")){
+                    				zbjsNum++;
+                    			}
+                    			if(bz.contains("停泵")){
+                    				tbNum++;
+                    			}
+                    			if(bz.contains("电路故障")){
+                    				dlgzNum++;
+                    			}
                 			}
                 		}
+                	}
+                	Integer[] bzArr = {bydNum,zbjsNum,tbNum,dlgzNum};
+                	//冒泡降序排列
+                	for(int k = 0 ; k < bzArr.length - 1 ; k++){
+                		for(int j = 0 ; j < bzArr.length-k-1 ; j++){
+                			if(bzArr[j] < bzArr[j+1]){
+                				int temp = bzArr[j];
+                				bzArr[j] = bzArr[j+1];
+                				bzArr[j+1] = temp;
+                			}
+                		}
+                	}
+                	String fxResult = "";
+                	if(jl.equals("不合格")){
+                		if(bzArr[0].equals(bydNum)){
+                    		fxResult = "泵压低";
+                    	}else if(bzArr[0].equals(zbjsNum)){
+                    		fxResult = "注不进水";
+                    	}else if(bzArr[0].equals(tbNum)){
+                    		fxResult = "停泵";
+                    	}else{
+                    		fxResult = "电路故障";
+                    	}
                 	}
                 	Integer[] yyArr = {zcyNum,zyNum,gyNum};
                 	//冒泡降序排列
@@ -1067,13 +1109,6 @@ public class CommonAction extends DispatchAction {
                 		yy_text = "高压("+gyNum+")";
                 	}
                 	
-//                	if(zcyNum > zyNum && zcyNum > gyNum){
-//                		yy_text = "常压("+zcyNum+")";
-//                	}else if(zyNum > gyNum && zyNum > zcyNum){
-//                		yy_text = "中压("+zyNum+")";
-//                	}else if(gyNum > zyNum && gyNum > zcyNum){
-//                		yy_text = "高压("+gyNum+")";
-//                	}
                 	for(Iterator<Dba02> it = hgList.iterator() ; it.hasNext();){
                 		Dba02 dba = it.next();
                 		hgZsNum_total += dba.getRzsl();
@@ -1127,11 +1162,7 @@ public class CommonAction extends DispatchAction {
         			cell = row1.createCell(10);//原因分析
         			style.setFont(font_1);
         			cell.setCellStyle(style);
-        			if(opt1Num > 0){
-        				cell.setCellValue("泵压低");
-        			}else{
-        				cell.setCellValue("");
-        			}
+        			cell.setCellValue(fxResult);
                 }
             	FileOutputStream fout = new FileOutputStream(absoFilePath);//存到服务器
             	xssfWorkbook.write(fout);  
@@ -1180,6 +1211,7 @@ public class CommonAction extends DispatchAction {
             }
     	}
     	CommonTools.getJsonPkg(map_final, response);
+    	System.out.println("分析层段合格率结束--"+CurrentTime.getCurrentTime());
     	return null;
 	}
 	
