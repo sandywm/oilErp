@@ -1068,7 +1068,7 @@ public class CommonAction extends DispatchAction {
                 		}
                 	}
                 	Integer[] bzArr = {bydNum,zbjsNum,tbNum,dlgzNum};
-                	//冒泡降序排列
+                	//冒泡降序排列1
                 	for(int k = 0 ; k < bzArr.length - 1 ; k++){
                 		for(int j = 0 ; j < bzArr.length-k-1 ; j++){
                 			if(bzArr[j] < bzArr[j+1]){
