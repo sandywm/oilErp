@@ -53,7 +53,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.oil.factory.AppFactory;
+import com.oil.module.Dba01;
 import com.oil.module.Dba02;
+import com.oil.service.Dba01Manager;
 import com.oil.service.Dba02Manager;
 import com.oil.tools.CommonTools;
 import com.oil.util.Constants;
@@ -1332,4 +1334,61 @@ public class CommonAction extends DispatchAction {
 		return null;
 	}
 	
+	
+	//---------------------------------------调配建效率----------------------------------------------//
+	
+	/**
+	 * 分页获取油井记录列表
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getPageyjJxlData(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// TODO Auto-generated method stub
+		Dba01Manager dm = (Dba01Manager) AppFactory.instance(null).getApp(Constants.WEB_DBA_01_INFO);
+		String jh = CommonTools.getFinalStr("jh", request);
+		String sDate = CommonTools.getFinalStr("sDate", request);
+		String eDate = CommonTools.getFinalStr("eDate", request);
+		Integer count = dm.getCountByOpt(jh, sDate, eDate);
+		Map<String,Object> map = new HashMap<String,Object>();
+		String msg = "暂无记录";
+		if(count > 0){
+			msg = "success";
+			Integer pageSize = PageConst.getPageSize(String.valueOf(request.getParameter("limit")), 10);//等同于pageSize
+			Integer pageNo = CommonTools.getFinalInteger("page", request);//等同于pageNo
+			List<Dba01> dbList = dm.listPageInfoByOpt(jh, sDate, eDate, pageNo, pageSize);
+			List<Object> list_d = new ArrayList<Object>();
+			for(Dba01 db01 : dbList){
+				Map<String,Object> map_d = new HashMap<String,Object>();
+				map_d.put("jh", db01.getJh());//井号
+				map_d.put("rq", db01.getRq().substring(0, 10));//日期
+				map_d.put("db", db01.getDb());//方
+				map_d.put("yz", db01.getYz());//嘴
+				map_d.put("pl", db01.getPl());//排量
+				map_d.put("bj", db01.getBj());//工
+				map_d.put("cc", db01.getCc());//作制
+				map_d.put("cc1", db01.getCc1());//度
+				map_d.put("scsj", db01.getScsj());//时间
+				map_d.put("rcyl1", db01.getRcyl1());//产液
+				map_d.put("rcyl", db01.getRcyl());//产油
+				map_d.put("hs", db01.getHs());//含水
+				map_d.put("rcql", db01.getRcql());//日产气
+				map_d.put("bx", db01.getBx());//泵效
+				map_d.put("qyb", db01.getQyb());//气油比
+				map_d.put("bs", db01.getBs());//泵深
+				map_d.put("bz", db01.getBz());//备注
+				list_d.add(map_d);
+			}
+			map.put("data", list_d);
+			map.put("count", count);
+			map.put("code", 0);
+		}
+		map.put("msg", msg);
+		CommonTools.getJsonPkg(map, response);
+		return null;
+	}
 }

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <appContext>
 	<app id="dba_02_info_Web" class="com.oil.service.impl.Dba02ManagerImpl"/>
+	<app id="dba_01_info_Web" class="com.oil.service.impl.Dba01ManagerImpl"/>
 </appContext>

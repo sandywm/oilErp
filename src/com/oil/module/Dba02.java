@@ -1,7 +1,5 @@
 package com.oil.module;
 
-import java.sql.Timestamp;
-
 /**
  * Dba02Id entity. @author MyEclipse Persistence Tools
  */

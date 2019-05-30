@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <daoContext>
 	<dao id="dba_02_info_Dao" class="com.oil.dao.impl.Dba02DaoImpl"/>
+	<dao id="dba_01_info_Dao" class="com.oil.dao.impl.Dba01DaoImpl"/>
 </daoContext>
