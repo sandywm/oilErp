@@ -51,4 +51,21 @@ public class Dba01ManagerImpl implements Dba01Manager{
 		}
 	}
 
+	@Override
+	public List<Dba01> listValidInfoByOpt(String jh, String sDate, String eDate)
+			throws WEBException {
+		// TODO Auto-generated method stub
+		try {
+			dDao = (Dba01Dao) DaoFactory.instance(null).getDao(Constants.DAO_DBA_01_INFO);
+			Session sess = HibernateUtil.currentSession();
+			return dDao.findValidInfoByOpt(sess, jh, sDate, eDate);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new WEBException("根据井号、时间段获取有效油井记录列表（生产时间为24小时）时出现异常!");
+		} finally{
+			HibernateUtil.closeSession();
+		}
+	}
+
 }

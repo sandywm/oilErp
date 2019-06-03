@@ -28,4 +28,14 @@ public interface Dba01Manager {
 	 * @throws WEBException
 	 */
 	Integer getCountByOpt(String jh,String sDate,String eDate)throws WEBException;
+	
+	/**
+	 * 根据井号、时间段获取有效油井记录列表（生产时间为24小时）
+	 * @param jh 井号
+	 * @param sDate 开始时间
+	 * @param eDate 结束时间
+	 * @return
+	 * @throws WEBException
+	 */
+	List<Dba01> listValidInfoByOpt(String jh,String sDate,String eDate)throws WEBException;
 }

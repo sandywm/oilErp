@@ -29,4 +29,14 @@ public interface Dba01Dao {
 	 * @return
 	 */
 	Integer getCountByOpt(Session sess,String jh,String sDate,String eDate);
+	
+	/**
+	 * 根据井号、时间段获取有效油井记录列表（生产时间为24小时）
+	 * @param sess
+	 * @param jh 井号
+	 * @param sDate 开始时间
+	 * @param eDate 结束时间
+	 * @return
+	 */
+	List<Dba01> findValidInfoByOpt(Session sess,String jh,String sDate,String eDate);
 }

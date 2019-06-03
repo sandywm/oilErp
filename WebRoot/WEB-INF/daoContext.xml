@@ -2,4 +2,5 @@
 <daoContext>
 	<dao id="dba_02_info_Dao" class="com.oil.dao.impl.Dba02DaoImpl"/>
 	<dao id="dba_01_info_Dao" class="com.oil.dao.impl.Dba01DaoImpl"/>
+	<dao id="dba_04_info_Dao" class="com.oil.dao.impl.Dba04DaoImpl"/>
 </daoContext>

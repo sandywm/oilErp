@@ -656,6 +656,6 @@ public class CurrentTime {
 	public static void main(String args[]) throws Exception{
 //		System.out.println(CurrentTime.stringConvertToTimestamp("2019-03-01 00:00:00"));
 		
-		System.out.println(CurrentTime.getSpecNewDate_1("2019-03-31", 1));
+		System.out.println(CurrentTime.dateConvertToString(CurrentTime.stringToDate_1("2019-1-1")));
 	}
 }

@@ -69,6 +69,7 @@
 		</property>
 		<mapping resource="com/oil/xml/Dba02.hbm.xml" />
 		<mapping resource="com/oil/xml/Dba01.hbm.xml" />
+		<mapping resource="com/oil/xml/Dba04.hbm.xml" />
 	</session-factory>
 
 </hibernate-configuration>

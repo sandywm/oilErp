@@ -47,4 +47,19 @@ public class Dba01DaoImpl implements Dba01Dao{
 		return CommonTools.longToInt(count_obj);
 	}
 
+	@Override
+	public List<Dba01> findValidInfoByOpt(Session sess, String jh,
+			String sDate, String eDate) {
+		// TODO Auto-generated method stub
+		String hql = " from Dba01 as db01 where db01.scsj = 24";
+		if(!jh.equals("")){
+			if(Constants.DATA_BASE_INFO.equals("oracle")){
+				hql += " and db01.jh = '"+jh+"' and db01.rq >= to_date('"+sDate+"','yyyy-mm-dd') and db01.rq <= to_date('"+eDate+"','yyyy-mm-dd')";
+			}else{
+				hql += " and db01.jh = '"+jh+"' and date(db01.rq) >= '"+sDate+"' and date(db01.rq) <= '"+eDate+"'";
+			}
+		}
+		return sess.createQuery(hql).list();
+	}
+
 }

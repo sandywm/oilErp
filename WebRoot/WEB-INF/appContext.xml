@@ -2,4 +2,5 @@
 <appContext>
 	<app id="dba_02_info_Web" class="com.oil.service.impl.Dba02ManagerImpl"/>
 	<app id="dba_01_info_Web" class="com.oil.service.impl.Dba01ManagerImpl"/>
+	<app id="dba_04_info_Web" class="com.oil.service.impl.Dba04ManagerImpl"/>
 </appContext>

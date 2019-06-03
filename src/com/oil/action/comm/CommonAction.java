@@ -55,8 +55,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.oil.factory.AppFactory;
 import com.oil.module.Dba01;
 import com.oil.module.Dba02;
+import com.oil.module.Dba04;
 import com.oil.service.Dba01Manager;
 import com.oil.service.Dba02Manager;
+import com.oil.service.Dba04Manager;
 import com.oil.tools.CommonTools;
 import com.oil.util.Constants;
 import com.oil.action.base.Transcode;
@@ -268,7 +270,7 @@ public class CommonAction extends DispatchAction {
 		boolean upFlag = false;
 		String fileUrl = "";
 		String filename = "";
-		String opt = CommonTools.getFinalStr("opt", request);//opt:zs(注水合格率),cd(层段合格率)
+		String opt = CommonTools.getFinalStr("opt", request);//opt:zs(注水合格率),cd(层段合格率),tp(调配见效率)
 		if(opt.equals("")){
 			opt = "zs";//默认为注水
 		}
@@ -300,6 +302,8 @@ public class CommonAction extends DispatchAction {
 									flag = true;
 								}
 							}
+						}else if(opt.equals("tp")){//调配建效率
+							//没有要求
 						}
 						if(flag){
 							filename = filePre + "_" + CurrentTime.getRadomTime() + "." + suffix;
@@ -1389,6 +1393,433 @@ public class CommonAction extends DispatchAction {
 		}
 		map.put("msg", msg);
 		CommonTools.getJsonPkg(map, response);
+		return null;
+	}
+	
+	/**
+	 * 处理调配见效率
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward dealTpjxlExcel(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		System.out.println("分析层段合格率开始--"+CurrentTime.getCurrentTime());
+		Map<String,String> map_final = new HashMap<String,String>();
+		Dba01Manager dm = (Dba01Manager) AppFactory.instance(null).getApp(Constants.WEB_DBA_01_INFO);
+		Dba04Manager d4m = (Dba04Manager) AppFactory.instance(null).getApp(Constants.WEB_DBA_04_INFO);
+		String excelName = Transcode.unescape_new1("excelName", request);//指定期限2019-03-01~2019-03-31_层段合格率.xlsx
+		String absoFilePath = WebUrl.DATA_URL_UP_FILE_UPLOAD + "/" + excelName;
+//		String absoFilePath = "d:\\test.xlsx";
+		File f = new File(absoFilePath);
+    	InputStream inputStream = new FileInputStream(f);
+    	XSSFWorkbook xssfWorkbook = new XSSFWorkbook(inputStream);
+    	Integer sheetNum = xssfWorkbook.getNumberOfSheets();
+    	if(sheetNum >= 1){
+    		XSSFSheet sheet = xssfWorkbook.getSheetAt(0);
+        	XSSFCellStyle style = xssfWorkbook.createCellStyle();  
+            style.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式  
+            style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);  
+            style.setBorderBottom(XSSFCellStyle.BORDER_THIN); //下边框    
+            style.setBorderLeft(XSSFCellStyle.BORDER_THIN);//左边框    
+            style.setBorderTop(XSSFCellStyle.BORDER_THIN);//上边框    
+            style.setBorderRight(XSSFCellStyle.BORDER_THIN);//右边框 
+            
+            XSSFFont font_1 = xssfWorkbook.createFont();    
+            font_1.setFontName("宋体");    
+            font_1.setFontHeightInPoints((short) 12);//设置字体大小  (备注)
+            style.setFont(font_1);
+            
+            XSSFCellStyle style_pass = xssfWorkbook.createCellStyle();  
+            style_pass.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式  
+            style_pass.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);  
+            style_pass.setBorderBottom(XSSFCellStyle.BORDER_THIN); //下边框    
+            style_pass.setBorderLeft(XSSFCellStyle.BORDER_THIN);//左边框    
+            style_pass.setBorderTop(XSSFCellStyle.BORDER_THIN);//上边框    
+            style_pass.setBorderRight(XSSFCellStyle.BORDER_THIN);//右边框 
+            
+            XSSFCellStyle style_no_pass = xssfWorkbook.createCellStyle();  
+            style_no_pass.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式  
+            style_no_pass.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);  
+            style_no_pass.setBorderBottom(XSSFCellStyle.BORDER_THIN); //下边框    
+            style_no_pass.setBorderLeft(XSSFCellStyle.BORDER_THIN);//左边框    
+            style_no_pass.setBorderTop(XSSFCellStyle.BORDER_THIN);//上边框    
+            style_no_pass.setBorderRight(XSSFCellStyle.BORDER_THIN);//右边框 
+            
+            XSSFRow row0 = sheet.getRow(1);
+            String jhTxt = row0.getCell(1).getStringCellValue().replace(" ", "").replace("\t", "");//井号
+            String tprqTxt = row0.getCell(2).getStringCellValue().replace(" ", "").replace("\t", "");//调配日期
+            String yjhTxt = sheet.getRow(2).getCell(12).getStringCellValue().replace(" ", "").replace("\t", "");//油井号
+            
+            Double rcy_cell_front_total = 0.0;//调配前下调日产油
+            Double rcy1_cell_front_total = 0.0;//调配前下调日产液
+            Double hs_cell_front_total = 0.0;//调配前下调含水
+            Double dym_cell_front_total = 0.0;//调配前下调动液面
+            Double rcy_cell_back_total = 0.0;//调配后下调日产油
+            Double rcy1_cell_back_total = 0.0;//调配后下调日产液
+            Double hs_cell_back_total = 0.0;//调配后下调含水
+            Double dym_cell_back_total = 0.0;//调配后下调动液面
+            
+            
+            Double rcy_cell_front = 0.0;//调配前上调日产油
+            Double rcy1_cell_front = 0.0;//调配前上调日产液
+            Double hs_cell_front = 0.0;//调配后前调含水
+            Double dym_cell_front = 0.0;//调配前上调动液面
+            Double rcy_cell_back = 0.0;//调配后上调日产油
+            Double rcy1_cell_back = 0.0;//调配后上调日产液
+            Double hs_cell_back = 0.0;//调配后上调含水
+            Double dym_cell_back = 0.0;//调配后上调动液面
+            
+            
+            
+            if(jhTxt.equals("井号") && tprqTxt.equals("调配日期") && yjhTxt.equals("井号")){
+            	int num = 0;
+            	for(int i = 3 ; i < sheet.getLastRowNum()+1 ; i++){
+	            	XSSFRow row1 = sheet.getRow(i);
+	            	Integer cellType = row1.getCell(0).getCellType();
+	            	String tpDate = row1.getCell(2).getStringCellValue().replace(".", "-");//调配日期
+	            	String yjh = row1.getCell(12).getStringCellValue().replace(".", "-");//油井号
+	            	if(!tpDate.equals("")){
+//	            		tpDate = CurrentTime.dateConvertToString(CurrentTime.stringToDate_1(tpDate));
+	            		String tpFrontDate = CurrentTime.getFinalDate(tpDate,-9);//调配前往前推10天
+	            		String tpBackDate_s = CurrentTime.getSpecNewDate_1(tpDate, 1);//调配后推后一个月开始日期
+	            		String tpBackDate_e = CurrentTime.getSpecNewDate_1(tpDate, 2);//调配后推后一个月结束日期
+	            		List<Dba01> dbaList_front = dm.listValidInfoByOpt(yjh, tpFrontDate, tpDate);//调配前
+	            		String ny_front = tpDate.replace("-", "").substring(0, 6);
+	            		String ny_back = tpBackDate_s.replace("-", "").substring(0, 6);
+	            		Dba04 db_front = d4m.getEntityByOpt(yjh, ny_front);
+	            		List<Dba01> dbaList_back = dm.listValidInfoByOpt(yjh, tpBackDate_s, tpBackDate_e);//调配后
+	            		Dba04 db_back = d4m.getEntityByOpt(yjh, ny_back);
+	            		Integer i_front = 0;
+	            		Double rcy1_front_cell = 0.0;//日产液
+	            		Double rcy_front_cell = 0.0;//日产油
+	            		Double hs_front_cell = 0.0;//含水
+	            		Double dym_front_cell = 0.0;//动液面
+	            		
+	            		Double rcy1_back_cell = 0.0;//日产液
+	            		Double rcy_back_cell = 0.0;//日产油
+	            		Double hs_back_cell = 0.0;//含水
+	            		Double dym_back_cell = 0.0;//动液面
+	            		for(Dba01 db : dbaList_front){
+	            			rcy1_front_cell += db.getRcyl1();
+	            			rcy_front_cell += db.getRcyl();
+	            			hs_front_cell += db.getHs();
+	            			i_front++;
+	            		}
+	            		if(i_front > 0){
+	            			rcy1_front_cell = Convert.convertInputNumber_6(rcy1_front_cell / i_front);
+	            			rcy_front_cell = Convert.convertInputNumber_6(rcy_front_cell / i_front);
+	            			hs_front_cell = Convert.convertInputNumber_6(hs_front_cell / i_front);
+	            		}
+	            		if(db_front != null){
+	            			dym_front_cell = db_front.getDym();
+	            		}
+	            		XSSFCell cell = row1.getCell(13);//日产液（调配前）
+	        			style.setFont(font_1);
+	        			cell.setCellStyle(style);
+	        			cell.setCellValue(rcy1_front_cell);
+	        			
+	        			cell = row1.getCell(14);//日产油（调配前）
+	        			style.setFont(font_1);
+	        			cell.setCellStyle(style);
+	        			cell.setCellValue(rcy_front_cell);
+	            		
+	        			cell = row1.getCell(15);//含水（调配前）
+	        			style.setFont(font_1);
+	        			cell.setCellStyle(style);
+	        			cell.setCellValue(hs_front_cell);
+	        			
+	        			cell = row1.getCell(16);//动液面（调配前）
+	        			style.setFont(font_1);
+	        			cell.setCellStyle(style);
+	        			cell.setCellValue(dym_front_cell);
+	        			
+	        			 rcy_cell_front += rcy_front_cell;//调配前日产油
+	                     rcy1_cell_front += rcy1_front_cell;//调配前日产液
+	                     hs_cell_front += hs_front_cell;//调配前含水
+	                     dym_cell_front += hs_front_cell;//调配前动液面
+	                     
+	        			
+	        			//-------------------调配后----------------------//
+	        			
+	            		Integer i_back = 0;
+	            		for(Dba01 db1 : dbaList_back){
+	            			rcy1_back_cell += db1.getRcyl1();
+	            			rcy_back_cell += db1.getRcyl();
+	            			hs_back_cell += db1.getHs();
+	            			i_back++;
+	            		}
+	            		if(i_back > 0){
+	            			rcy1_back_cell = Convert.convertInputNumber_6(rcy1_back_cell / i_back);
+	            			rcy_back_cell = Convert.convertInputNumber_6(rcy_back_cell / i_back);
+	            			hs_back_cell = Convert.convertInputNumber_6(hs_back_cell / i_back);
+	            		}
+	            		
+	            		if(db_back != null){
+	            			dym_back_cell = db_back.getDym();
+	            		}
+	            		
+	            		cell = row1.getCell(17);//日产液（调配后）
+	        			style.setFont(font_1);
+	        			cell.setCellStyle(style);
+	        			cell.setCellValue(rcy1_back_cell);
+	        			
+	        			cell = row1.getCell(18);//日产油（调配后）
+	        			style.setFont(font_1);
+	        			cell.setCellStyle(style);
+	        			cell.setCellValue(rcy_back_cell);
+	            		
+	        			cell = row1.getCell(19);//含水（调配后）
+	        			style.setFont(font_1);
+	        			cell.setCellStyle(style);
+	        			cell.setCellValue(hs_back_cell);
+	        			
+	        			cell = row1.getCell(20);//动液面（调配后）
+	        			style.setFont(font_1);
+	        			cell.setCellStyle(style);
+	        			cell.setCellValue(dym_back_cell);
+	            		
+	        			rcy_cell_back += rcy1_back_cell;//调配后日产油
+	                    rcy1_cell_back += rcy_back_cell;//调配后日产液
+	                    hs_cell_back += hs_back_cell;//调配后含水
+	                    dym_cell_back += dym_back_cell;//调配后动液面
+	        			
+	            	}else{
+	            		if(cellType.equals(0)){
+	            			continue;
+	            		}else{
+	            			String columnTxt = row1.getCell(0).getStringCellValue();
+	            			if(columnTxt.equals("下调小计")){
+	            				rcy_cell_front = Convert.convertInputNumber_6(rcy_cell_front / num);
+	            				rcy1_cell_front = Convert.convertInputNumber_6(rcy1_cell_front / num);
+	            				hs_cell_front = Convert.convertInputNumber_6(hs_cell_front / num);
+	            				dym_cell_front = Convert.convertInputNumber_6(dym_cell_front / num);
+	            				rcy_cell_back = Convert.convertInputNumber_6(rcy_cell_back / num);
+	            				rcy1_cell_back = Convert.convertInputNumber_6(rcy1_cell_back / num);
+	            				hs_cell_back = Convert.convertInputNumber_6(hs_cell_back / num);
+	            				dym_cell_back = Convert.convertInputNumber_6(dym_cell_back / num);
+	            				
+	            				XSSFCell cell = row1.getCell(13);//日产液（调配前）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(rcy1_cell_front);
+	    	        			
+	    	        			cell = row1.getCell(14);//日产油（调配前）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(rcy_cell_front);
+	    	            		
+	    	        			cell = row1.getCell(15);//含水（调配前）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(hs_cell_front);
+	    	        			
+	    	        			cell = row1.getCell(16);//动液面（调配前）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(dym_cell_front);
+	    	        			
+	    	        			cell = row1.getCell(17);//日产液（调配后）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(rcy1_cell_back);
+	    	        			
+	    	        			cell = row1.getCell(18);//日产油（调配后）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(rcy_cell_back);
+	    	            		
+	    	        			cell = row1.getCell(19);//含水（调配后）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(hs_cell_back);
+	    	        			
+	    	        			cell = row1.getCell(20);//动液面（调配后）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(dym_cell_back);
+	    	        			
+	    	        			rcy_cell_front_total += rcy_cell_front;//调配前下调日产油
+	    	                    rcy1_cell_front_total += rcy1_cell_front;//调配前下调日产液
+	    	                    hs_cell_front_total += hs_cell_front;//调配前下调含水
+	    	                    dym_cell_front_total += dym_cell_front;//调配前下调动液面
+	    	                    rcy_cell_back_total += rcy_cell_back;//调配后下调日产油
+	    	                    rcy1_cell_back_total += rcy1_cell_back;//调配后下调日产液
+	    	                    hs_cell_back_total += hs_cell_back;//调配后下调含水
+	    	                    dym_cell_back_total += dym_cell_back;//调配后下调动液面
+	            				
+	            			}else if(columnTxt.equals("上调合计")){
+	            				rcy_cell_front = Convert.convertInputNumber_6(rcy_cell_front / num);
+	            				rcy1_cell_front = Convert.convertInputNumber_6(rcy1_cell_front / num);
+	            				hs_cell_front = Convert.convertInputNumber_6(hs_cell_front / num);
+	            				dym_cell_front = Convert.convertInputNumber_6(dym_cell_front / num);
+	            				rcy_cell_back = Convert.convertInputNumber_6(rcy_cell_back / num);
+	            				rcy1_cell_back = Convert.convertInputNumber_6(rcy1_cell_back / num);
+	            				hs_cell_back = Convert.convertInputNumber_6(hs_cell_back / num);
+	            				dym_cell_back = Convert.convertInputNumber_6(dym_cell_back / num);
+	            				
+	            				XSSFCell cell = row1.getCell(13);//日产液（调配前）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(rcy1_cell_front);
+	    	        			
+	    	        			cell = row1.getCell(14);//日产油（调配前）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(rcy_cell_front);
+	    	            		
+	    	        			cell = row1.getCell(15);//含水（调配前）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(hs_cell_front);
+	    	        			
+	    	        			cell = row1.getCell(16);//动液面（调配前）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(dym_cell_front);
+	    	        			
+	    	        			cell = row1.getCell(17);//日产液（调配后）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(rcy1_cell_back);
+	    	        			
+	    	        			cell = row1.getCell(18);//日产油（调配后）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(rcy_cell_back);
+	    	            		
+	    	        			cell = row1.getCell(19);//含水（调配后）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(hs_cell_back);
+	    	        			
+	    	        			cell = row1.getCell(20);//动液面（调配后）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(dym_cell_back);
+	    	        			
+	    	        			rcy_cell_front_total = rcy_cell_front;//调配前下调日产油
+	    	                    rcy1_cell_front_total = rcy1_cell_front;//调配前下调日产液
+	    	                    hs_cell_front_total = hs_cell_front;//调配前下调含水
+	    	                    dym_cell_front_total = dym_cell_front;//调配前下调动液面
+	    	                    rcy_cell_back_total = rcy_cell_back;//调配后下调日产油
+	    	                    rcy1_cell_back_total = rcy1_cell_back;//调配后下调日产液
+	    	                    hs_cell_back_total = hs_cell_back;//调配后下调含水
+	    	                    dym_cell_back_total = dym_cell_back;//调配后下调动液面
+	    	        			
+	    	        			rcy_cell_front = 0.0;
+	            				rcy1_cell_front = 0.0;
+	            				hs_cell_front = 0.0;
+	            				dym_cell_front = 0.0;
+	            				rcy_cell_back = 0.0;
+	            				rcy1_cell_back = 0.0;
+	            				hs_cell_back = 0.0;
+	            				dym_cell_back = 0.0;
+	    	        			
+	    	        			num = 0;//清0
+	            			}else if(columnTxt.equals("总合计")){
+	            				rcy_cell_front_total = Convert.convertInputNumber_6(rcy_cell_front_total);
+	            				rcy1_cell_front_total = Convert.convertInputNumber_6(rcy1_cell_front_total);
+	            				hs_cell_front_total = Convert.convertInputNumber_6(hs_cell_front_total / 2);
+	            				dym_cell_front_total = Convert.convertInputNumber_6(dym_cell_front_total / 2);
+	            				rcy_cell_back_total = Convert.convertInputNumber_6(rcy_cell_back_total / num);
+	            				rcy1_cell_back_total = Convert.convertInputNumber_6(rcy1_cell_back_total / num);
+	            				hs_cell_back_total = Convert.convertInputNumber_6(hs_cell_back_total / 2);
+	            				dym_cell_back_total = Convert.convertInputNumber_6(dym_cell_back_total / 2);
+	            				
+	            				XSSFCell cell = row1.getCell(13);//日产液（调配前）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(rcy1_cell_front_total);
+	    	        			
+	    	        			cell = row1.getCell(14);//日产油（调配前）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(rcy_cell_front_total);
+	    	            		
+	    	        			cell = row1.getCell(15);//含水（调配前）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(hs_cell_front_total);
+	    	        			
+	    	        			cell = row1.getCell(16);//动液面（调配前）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(dym_cell_front_total);
+	    	        			
+	    	        			cell = row1.getCell(17);//日产液（调配后）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(rcy1_cell_back_total);
+	    	        			
+	    	        			cell = row1.getCell(18);//日产油（调配后）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(rcy_cell_back_total);
+	    	            		
+	    	        			cell = row1.getCell(19);//含水（调配后）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(hs_cell_back_total);
+	    	        			
+	    	        			cell = row1.getCell(20);//动液面（调配后）
+	    	        			style.setFont(font_1);
+	    	        			cell.setCellStyle(style);
+	    	        			cell.setCellValue(dym_cell_back_total);
+	            				break;
+	            			}
+	            		}
+	            	}
+	            	num++;
+            	}
+            	FileOutputStream fout = new FileOutputStream(absoFilePath);//存到服务器
+            	xssfWorkbook.write(fout);  
+                fout.close();
+              //向调配见效率json文件中写入记录
+                String s = null;
+        		String dataPath = WebUrl.DATA_URL_JSON + "/tpjxl.json";
+        		File file = new File(dataPath);
+        		InputStreamReader br = new InputStreamReader(new FileInputStream(file),"utf-8");//读取文件,同时指定编码
+        		StringBuffer sb = new StringBuffer();
+                char[] ch = new char[128];  //一次读取128个字符
+                int len = 0;
+                while((len = br.read(ch,0, ch.length)) != -1){
+                    sb.append(ch, 0, len);
+                }
+                s = sb.toString();
+                //新增加的记录
+                JSONObject appObject = new JSONObject();
+                appObject.put("fileName", excelName);
+                appObject.put("fxDate", CurrentTime.getCurrentTime());
+                appObject.put("uploadUser", this.getLoginUserName(request));
+                
+                String newStr = "";
+                if(s.equals("")){//新增加
+                	JSONArray appArray = new JSONArray();
+                	appArray.add(appObject);
+                	JSONObject jsonObj = new JSONObject();
+                	jsonObj.put("excelList", appArray);
+                	newStr = jsonObj.toJSONString();
+                }else{//追加
+                	JSONObject dataJson = JSON.parseObject(s); 
+                    JSONArray features = dataJson.getJSONArray("excelList");// 找到features json数组
+                    features.add(appObject);
+                    newStr = dataJson.toJSONString();
+                }
+            	File file_1 = new File(dataPath);
+            	Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file_1), "UTF-8"));
+            	out.write(newStr);
+            	out.flush();
+            	out.close();
+            	map_final.put("result", "success");
+            }else{
+            	map_final.put("result", "contentError");//文件内容格式错误
+            }
+    	}
+    	CommonTools.getJsonPkg(map_final, response);
 		return null;
 	}
 }
