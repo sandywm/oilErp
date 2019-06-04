@@ -1338,8 +1338,22 @@ public class CommonAction extends DispatchAction {
 		return null;
 	}
 	
-	
 	//---------------------------------------调配建效率----------------------------------------------//
+	
+	
+	/**
+	 * 导向调配见效率页面
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward goTpPage(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		return mapping.findForward("tpPage");
+	}
 	
 	/**
 	 * 分页获取油井记录列表
@@ -1539,8 +1553,7 @@ public class CommonAction extends DispatchAction {
 	        			
 	        			 rcy_cell_front += rcy_front_cell;//调配前日产油
 	                     rcy1_cell_front += rcy1_front_cell;//调配前日产液
-	                     hs_cell_front += hs_front_cell;//调配前含水
-	                     dym_cell_front += hs_front_cell;//调配前动液面
+	                     dym_cell_front += dym_front_cell;//调配前动液面
 	                     
 	        			
 	        			//-------------------调配后----------------------//
@@ -1593,13 +1606,13 @@ public class CommonAction extends DispatchAction {
 	            		}else{
 	            			String columnTxt = row1.getCell(0).getStringCellValue();
 	            			if(columnTxt.equals("下调小计")){
-	            				rcy_cell_front = Convert.convertInputNumber_6(rcy_cell_front / num);
-	            				rcy1_cell_front = Convert.convertInputNumber_6(rcy1_cell_front / num);
-	            				hs_cell_front = Convert.convertInputNumber_6(hs_cell_front / num);
+	            				rcy_cell_front = Convert.convertInputNumber_6(rcy_cell_front);
+	            				rcy1_cell_front = Convert.convertInputNumber_6(rcy1_cell_front);
+	            				hs_cell_front = Convert.convertInputNumber_6((rcy1_cell_front - rcy_cell_front) * 100 / rcy1_cell_front);
 	            				dym_cell_front = Convert.convertInputNumber_6(dym_cell_front / num);
-	            				rcy_cell_back = Convert.convertInputNumber_6(rcy_cell_back / num);
-	            				rcy1_cell_back = Convert.convertInputNumber_6(rcy1_cell_back / num);
-	            				hs_cell_back = Convert.convertInputNumber_6(hs_cell_back / num);
+	            				rcy_cell_back = Convert.convertInputNumber_6(rcy_cell_back);
+	            				rcy1_cell_back = Convert.convertInputNumber_6(rcy1_cell_back);
+	            				hs_cell_back = Convert.convertInputNumber_6((rcy1_cell_back - rcy_cell_back) * 100 / rcy1_cell_back);
 	            				dym_cell_back = Convert.convertInputNumber_6(dym_cell_back / num);
 	            				
 	            				XSSFCell cell = row1.getCell(13);//日产液（调配前）
@@ -1644,21 +1657,19 @@ public class CommonAction extends DispatchAction {
 	    	        			
 	    	        			rcy_cell_front_total += rcy_cell_front;//调配前下调日产油
 	    	                    rcy1_cell_front_total += rcy1_cell_front;//调配前下调日产液
-	    	                    hs_cell_front_total += hs_cell_front;//调配前下调含水
 	    	                    dym_cell_front_total += dym_cell_front;//调配前下调动液面
 	    	                    rcy_cell_back_total += rcy_cell_back;//调配后下调日产油
 	    	                    rcy1_cell_back_total += rcy1_cell_back;//调配后下调日产液
-	    	                    hs_cell_back_total += hs_cell_back;//调配后下调含水
 	    	                    dym_cell_back_total += dym_cell_back;//调配后下调动液面
 	            				
 	            			}else if(columnTxt.equals("上调合计")){
-	            				rcy_cell_front = Convert.convertInputNumber_6(rcy_cell_front / num);
-	            				rcy1_cell_front = Convert.convertInputNumber_6(rcy1_cell_front / num);
-	            				hs_cell_front = Convert.convertInputNumber_6(hs_cell_front / num);
+	            				rcy_cell_front = Convert.convertInputNumber_6(rcy_cell_front);
+	            				rcy1_cell_front = Convert.convertInputNumber_6(rcy1_cell_front);
+	            				hs_cell_front = Convert.convertInputNumber_6((rcy1_cell_front - rcy_cell_front) * 100 / rcy1_cell_front);
 	            				dym_cell_front = Convert.convertInputNumber_6(dym_cell_front / num);
-	            				rcy_cell_back = Convert.convertInputNumber_6(rcy_cell_back / num);
-	            				rcy1_cell_back = Convert.convertInputNumber_6(rcy1_cell_back / num);
-	            				hs_cell_back = Convert.convertInputNumber_6(hs_cell_back / num);
+	            				rcy_cell_back = Convert.convertInputNumber_6(rcy_cell_back);
+	            				rcy1_cell_back = Convert.convertInputNumber_6(rcy1_cell_back);
+	            				hs_cell_back = Convert.convertInputNumber_6((rcy1_cell_back -  rcy_cell_back) * 100 / rcy1_cell_back);
 	            				dym_cell_back = Convert.convertInputNumber_6(dym_cell_back / num);
 	            				
 	            				XSSFCell cell = row1.getCell(13);//日产液（调配前）
@@ -1701,14 +1712,12 @@ public class CommonAction extends DispatchAction {
 	    	        			cell.setCellStyle(style);
 	    	        			cell.setCellValue(dym_cell_back);
 	    	        			
-	    	        			rcy_cell_front_total = rcy_cell_front;//调配前下调日产油
-	    	                    rcy1_cell_front_total = rcy1_cell_front;//调配前下调日产液
-	    	                    hs_cell_front_total = hs_cell_front;//调配前下调含水
-	    	                    dym_cell_front_total = dym_cell_front;//调配前下调动液面
-	    	                    rcy_cell_back_total = rcy_cell_back;//调配后下调日产油
-	    	                    rcy1_cell_back_total = rcy1_cell_back;//调配后下调日产液
-	    	                    hs_cell_back_total = hs_cell_back;//调配后下调含水
-	    	                    dym_cell_back_total = dym_cell_back;//调配后下调动液面
+	    	        			rcy_cell_front_total += rcy_cell_front;//调配前下调日产油
+	    	                    rcy1_cell_front_total += rcy1_cell_front;//调配前下调日产液
+	    	                    dym_cell_front_total += dym_cell_front;//调配前下调动液面
+	    	                    rcy_cell_back_total += rcy_cell_back;//调配后下调日产油
+	    	                    rcy1_cell_back_total += rcy1_cell_back;//调配后下调日产液
+	    	                    dym_cell_back_total += dym_cell_back;//调配后下调动液面
 	    	        			
 	    	        			rcy_cell_front = 0.0;
 	            				rcy1_cell_front = 0.0;
@@ -1723,11 +1732,11 @@ public class CommonAction extends DispatchAction {
 	            			}else if(columnTxt.equals("总合计")){
 	            				rcy_cell_front_total = Convert.convertInputNumber_6(rcy_cell_front_total);
 	            				rcy1_cell_front_total = Convert.convertInputNumber_6(rcy1_cell_front_total);
-	            				hs_cell_front_total = Convert.convertInputNumber_6(hs_cell_front_total / 2);
+	            				hs_cell_front_total = Convert.convertInputNumber_6((rcy1_cell_front_total - rcy_cell_front_total) * 100 / rcy1_cell_front_total);
 	            				dym_cell_front_total = Convert.convertInputNumber_6(dym_cell_front_total / 2);
-	            				rcy_cell_back_total = Convert.convertInputNumber_6(rcy_cell_back_total / num);
-	            				rcy1_cell_back_total = Convert.convertInputNumber_6(rcy1_cell_back_total / num);
-	            				hs_cell_back_total = Convert.convertInputNumber_6(hs_cell_back_total / 2);
+	            				rcy_cell_back_total = Convert.convertInputNumber_6(rcy_cell_back_total);
+	            				rcy1_cell_back_total = Convert.convertInputNumber_6(rcy1_cell_back_total);
+	            				hs_cell_back_total = Convert.convertInputNumber_6((rcy1_cell_back_total - rcy_cell_back_total) * 100 / rcy1_cell_back_total);
 	            				dym_cell_back_total = Convert.convertInputNumber_6(dym_cell_back_total / 2);
 	            				
 	            				XSSFCell cell = row1.getCell(13);//日产液（调配前）
@@ -1820,6 +1829,122 @@ public class CommonAction extends DispatchAction {
             }
     	}
     	CommonTools.getJsonPkg(map_final, response);
+		return null;
+	}
+	
+	/**
+	 * 获取调配见效率分析数据记录(下载用)
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getTpjxlData(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// TODO Auto-generated method stub
+		String s = null;
+		String msg = "暂无记录";
+		Integer count = 0;
+		Map<String,Object> map = new HashMap<String,Object>();
+		File file = new File(WebUrl.DATA_URL_JSON + "/tpjxl.json");
+		InputStreamReader br = new InputStreamReader(new FileInputStream(file),"utf-8");//读取文件,同时指定编码
+		StringBuffer sb = new StringBuffer();
+        char[] ch = new char[128];  //一次读取128个字符
+        int len = 0;
+        while((len = br.read(ch,0, ch.length)) != -1){
+            sb.append(ch, 0, len);
+        }
+        s = sb.toString();
+        if(!s.equals("")){
+        	JSONObject dataJson = JSON.parseObject(s); 
+            JSONArray features = dataJson.getJSONArray("excelList");// 找到features json数组
+            List<Object> list_d = new ArrayList<Object>();
+            for(Integer i = 0 ; i < features.size() ; i++){
+            	JSONObject obj = features.getJSONObject(i);// 获取features数组的第i个json对象
+            	Map<String,String> map_d = new HashMap<String,String>();
+            	String uploadUser = String.valueOf(obj.getString("uploadUser"));//获取上传者
+            	if(!uploadUser.equals("null")){
+            		if(uploadUser.equals(this.getLoginUserName(request))){
+                		msg = "success";
+                		map_d.put("fileName", obj.getString("fileName"));
+                		map_d.put("fxDate", obj.getString("fxDate"));
+                		map_d.put("filePath", obj.getString("filePath"));
+                		list_d.add(map_d);
+                		count++;
+                	}else{
+                		continue;
+                	}
+            	}else{
+            		continue;
+            	}
+            }
+            if(msg.equals("success")){
+            	map.put("data", list_d);
+            }
+        }
+        map.put("msg", msg);
+		map.put("count", count);
+		map.put("code", 0);
+        CommonTools.getJsonPkg(map, response);
+		return null;
+	}
+	
+	/**
+	 * 删除指定的调配见效率记录
+	 * @author wm
+	 * @date 2019-5-16 下午10:44:41 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward delTpjxlData(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// TODO Auto-generated method stub
+		String fileName = Transcode.unescape_new1("fileName", request);
+		String s = null;
+		File file = new File(WebUrl.DATA_URL_JSON + "/tpjxl.json");
+		InputStreamReader br = new InputStreamReader(new FileInputStream(file),"utf-8");//读取文件,同时指定编码
+		StringBuffer sb = new StringBuffer();
+        char[] ch = new char[128];  //一次读取128个字符
+        int len = 0;
+        while((len = br.read(ch,0, ch.length)) != -1){
+            sb.append(ch, 0, len);
+        }
+        String msg = "error";
+        s = sb.toString();
+        JSONObject dataJson = JSON.parseObject(s); 
+        JSONArray features = dataJson.getJSONArray("excelList");// 找到features json数组
+        Map<String,String> map = new HashMap<String,String>();
+        for(Integer i = 0 ; i < features.size() ; i++){
+        	JSONObject obj = features.getJSONObject(i);// 获取features数组的第i个json对象
+        	String fileName_json = String.valueOf(obj.getString("fileName"));//获取文件名称
+        	if(!fileName_json.equals("null")){
+        		if(fileName_json.equals(fileName)){
+        			//删除服务器上对应的数据文件
+            		FileOpration.deleteFile(WebUrl.DATA_URL_UP_FILE_UPLOAD + "/" + obj.getString("filePath"));
+            		obj.clear();
+            		msg = "success";
+            		break;
+            	}
+        	}
+        }
+        if(msg.equals("success")){
+        	String jsonStr = dataJson.toString();
+            Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+            out.write(jsonStr);
+        	out.flush();
+        	out.close();
+        }else{
+        	msg = "success";
+        }
+    	br.close();
+    	map.put("result", msg);
+        CommonTools.getJsonPkg(map, response);
 		return null;
 	}
 }
