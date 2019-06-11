@@ -66,8 +66,8 @@
   				<!-- 左侧导航区域（可配合layui已有的垂直导航） -->
   				<ul id="leftSideNav" class="layui-nav layui-nav-tree" lay-fliter="leftSideNav">
   					<li class="layui-nav-item navLi layui-this"><a href="javascript:void(0)" path="common.do?action=goZsPage" tab-id="1">作业注水合格率</a></li>
-  					<!--  li class="layui-nav-item navLi"><a href="javascript:void(0)" path="youzongtiaopei.html" tab-id="2">油综调配见效率</a></li>
-  					<li class="layui-nav-item navLi"><a href="javascript:void(0)" path="shuizongtiaopei.html" tab-id="3">水综调配方案</a></li>
+  					<li class="layui-nav-item navLi"><a href="javascript:void(0)" path="common.do?action=goTpPage" tab-id="2">油综调配见效率</a></li>
+  					<!-- li class="layui-nav-item navLi"><a href="javascript:void(0)" path="shuizongtiaopei.html" tab-id="3">水综调配方案</a></li>
   					<li class="layui-nav-item navLi"><a href="javascript:void(0)" path="shuizongcengduan.html" tab-id="4">水综层段合格率</a></li-->
   				</ul>
   			</div>
@@ -81,7 +81,7 @@
 	            </ul>
 	            <div class="layui-tab-content">
 	                <div class="layui-tab-item layui-show">
-	                	<iframe id="mainIframe" src="common.do?action=goZsPage" frameborder="0" scrolling="yes" width="100%" height="100%"></iframe>
+	                	<iframe id="mainIframe" src="common.do?action=goTpPage" frameborder="0" scrolling="yes" width="100%" height="100%"></iframe>
 	                </div>
 	            </div>
 	        </div>

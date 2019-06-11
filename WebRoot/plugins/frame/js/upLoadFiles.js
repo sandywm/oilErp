@@ -57,7 +57,7 @@ layui.define(['element','jquery','upload','form'],function(exports){
 			    			}
 			    		}else{
 			    			//如果是其他文件类类型，单个文件不能大于10M
-			    			if(opts == 'impHglFile' || opts == 'impCdFile'){//注水合格率分析
+			    			if(opts == 'impHglFile' || opts == 'impCdFile' || opts == 'impJxlFile'){//注水合格率分析
 			    				if(size > (20 * 1024 * 1024)){
 				    				layer.msg('上传的文件不能大于20M',{icon:5,anim:6,time:2000});
 				    				return;
@@ -75,7 +75,7 @@ layui.define(['element','jquery','upload','form'],function(exports){
 				  ,done: function(res, index, upload){
 					layer.closeAll('loading');
 				    if(res.msg == 'success'){ //上传成功
-				    	if(opts == 'impHglFile' || opts == 'impCdFile'){
+				    	if(opts == 'impHglFile' || opts == 'impCdFile' || opts == 'impJxlFile'){
 				    		//执行读取通知书 调出遮罩层	
 				    		succFileName = res.fileName;
 				    		$('.indexLayer').show();
@@ -105,10 +105,12 @@ layui.define(['element','jquery','upload','form'],function(exports){
 					//parent.$('body').find('.loadingWrap').html(_this.data.readingTips);
 					$('.upTipsTxt').hide();
 					$('.spinnerBox').show();
-					if(opts == 'impHglFile'){//读取通知书
+					if(opts == 'impHglFile'){
 						tmpUrl = '/common.do?action=dealZsExcel';
 					}else if(opts == 'impCdFile'){
 						tmpUrl = '/common.do?action=dealCdHglExcel';
+					}else if(opts == 'impJxlFile'){//调配见效率
+						tmpUrl = '/common.do?action=dealTpjxlExcel';
 					}
 					_this.readImportFile(tmpUrl,succFileName);
 				}

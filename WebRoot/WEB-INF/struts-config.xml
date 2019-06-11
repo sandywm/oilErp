@@ -9,7 +9,8 @@
   <action-mappings >
     <action path="/common" parameter="action" scope="request" type="com.oil.action.comm.CommonAction">
 		<forward name="welcome" path="/index.jsp"></forward><!-- 欢迎页面 -->
-		<forward name="zsPage" path="/Module/shuizongManager/jsp/shuizongManager.jsp"></forward><!-- 学科管理首页 -->
+		<forward name="zsPage" path="/Module/shuizongManager/jsp/shuizongManager.jsp"></forward><!-- 水综 -->
+		<forward name="tpPage" path="/Module/tiaopeiManager/jsp/tiaopeiManager.jsp"></forward><!-- 调配见效率-->
     </action>
     <action path="/login" parameter="action" scope="request" type="com.oil.action.login.LoginAction">
       <forward name="loginOut" path="/login.jsp"></forward><!-- 登出 -->

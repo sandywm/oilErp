@@ -10,7 +10,8 @@
 	line-height:18px;
 }
 .hglForm,
-.cdForm{
+.cdForm,
+.jxlForm{
 	display:none;
 }
 .layui-tab-title{
