@@ -1595,10 +1595,11 @@ public class CommonAction extends DispatchAction {
 	        			cell.setCellStyle(style);
 	        			cell.setCellValue(dym_back_cell);
 	            		
-	        			rcy_cell_back += rcy1_back_cell;//调配后日产油
-	                    rcy1_cell_back += rcy_back_cell;//调配后日产液
-	                    hs_cell_back += hs_back_cell;//调配后含水
+	        			rcy_cell_back += rcy_back_cell;//调配后日产油
+	                    rcy1_cell_back += rcy1_back_cell;//调配后日产液
 	                    dym_cell_back += dym_back_cell;//调配后动液面
+	                    
+	                    num++;
 	        			
 	            	}else{
 	            		if(cellType.equals(0)){
@@ -1614,7 +1615,6 @@ public class CommonAction extends DispatchAction {
 	            				rcy1_cell_back = Convert.convertInputNumber_6(rcy1_cell_back);
 	            				hs_cell_back = Convert.convertInputNumber_6((rcy1_cell_back - rcy_cell_back) * 100 / rcy1_cell_back);
 	            				dym_cell_back = Convert.convertInputNumber_6(dym_cell_back / num);
-	            				
 	            				XSSFCell cell = row1.getCell(13);//日产液（调配前）
 	    	        			style.setFont(font_1);
 	    	        			cell.setCellStyle(style);
@@ -1782,7 +1782,7 @@ public class CommonAction extends DispatchAction {
 	            			}
 	            		}
 	            	}
-	            	num++;
+	            	
             	}
             	FileOutputStream fout = new FileOutputStream(absoFilePath);//存到服务器
             	xssfWorkbook.write(fout);  
