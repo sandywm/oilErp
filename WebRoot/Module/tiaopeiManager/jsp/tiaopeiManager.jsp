@@ -272,7 +272,7 @@
 							  	skin: 'layui-layer-molv',
 							  	btn: ['确定','取消'] //按钮
 							},function(){//注水合格率删除
-								page.delFileFun(fileName,'common.do?action=delTpjxlData','hgl');
+								page.delFileFun(fileName,'common.do?action=delTpjxlData','jxl');
 							});
 						}
 					});
