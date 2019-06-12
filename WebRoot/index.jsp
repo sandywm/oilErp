@@ -81,7 +81,7 @@
 	            </ul>
 	            <div class="layui-tab-content">
 	                <div class="layui-tab-item layui-show">
-	                	<iframe id="mainIframe" src="common.do?action=goTpPage" frameborder="0" scrolling="yes" width="100%" height="100%"></iframe>
+	                	<iframe id="mainIframe" src="common.do?action=goZsPage" frameborder="0" scrolling="yes" width="100%" height="100%"></iframe>
 	                </div>
 	            </div>
 	        </div>
